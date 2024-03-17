@@ -1,65 +1,41 @@
 use v5.38;
+
 use local::lib;
 
 use Object::Pad;
 
 class Game::Property::Named;
 apply Game::Property;
-
+no warnings qw(experimental::builtin);
+use builtin qw(true false);
 use feature qw(say);
 use Data::Printer;
 
-field $my_name :param(name);
+field $name :param :reader;
 
-field $is_dirty;
-
-field %abilities = (
-    introduce => \&introduce,
-    set_name => \&my_name,
-    get_name => \&my_name,
-);
-
-method name { 'named' }
-
-method my_name(@params)
+ADJUST
 {
-    if (@params)
+    my %abilities = (
+        set_name => method($entity, $new) {
+            $name = $new
+                if $name && $new ne $name;
+            $self->is_dirty(true);
+            return
+        },
+        get_name => method($entity) {
+            return $name
+        },
+    );
+
+    for my $ability (keys %abilities)
     {
-        $my_name = $params[0] // 'nobody';
+        $self->add_ability($ability, $abilities{$ability});
     }
-
-    $self->introduce();
-    return $my_name
-}
-
-method introduce(@params)
-{
-    say("Hello, I'm called $my_name.")
-}
-
-method abilities()
-{
-    return [sort keys %abilities]
-}
-
-method update($command)
-{
-    if ($abilities{$command->action()})
-    {
-        $abilities{$command->action()}->($self, $command->params()->@*);
-    }
-}
-
-method can_process($action)
-{
-    return exists $abilities{$action}
 }
 
 method stringify()
 {
-    return
-        sprintf "Named ($my_name), abilities: %s.",
-            join(', ', ($self->abilities())->@*);
+    return sprintf "Name ($name)";
 }
 
 1;
