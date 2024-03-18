@@ -3,6 +3,12 @@ use local::lib;
 use Object::Pad;
 
 class Game::Trait::Sight;
+
+method description($name='An entity with this trait')
+{
+    return "$name can see."
+}
+
 apply Game::Trait;
 
 no warnings qw(experimental::builtin);
@@ -11,8 +17,8 @@ use feature qw(say);
 use Data::Printer;
 use Game::World;
 
-field $distance :reader :param=10;
-field $decrement :reader :param=1;
+field $distance :param=10;
+field $decrement :param=1;
 
 ADJUST
 {

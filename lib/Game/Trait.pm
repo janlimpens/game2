@@ -9,6 +9,8 @@ use Data::Printer;
 field $is_dirty :accessor :param=!1;
 field %abilities;
 
+method description;
+
 method abilities()
 {
     return [sort keys %abilities]

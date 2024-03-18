@@ -3,6 +3,12 @@ use local::lib;
 use Object::Pad;
 
 class Game::Trait::Position;
+
+method description($name='An entity with this trait')
+{
+    return "$name has a position. It can be directly changed. It is not intended to be used directly, in regular situations."
+}
+
 apply Game::Trait;
 
 no warnings qw(experimental::builtin);
@@ -12,7 +18,7 @@ use Carp;
 use Data::Printer;
 use Game::Domain::Point;
 
-field $position :accessor :param=Game::Domain::Point->origin();
+field $position :param=Game::Domain::Point->origin();
 
 ADJUST
 {

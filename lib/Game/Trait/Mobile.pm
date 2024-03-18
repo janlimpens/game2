@@ -3,12 +3,17 @@ use local::lib;
 use Object::Pad;
 
 class Game::Trait::Mobile;
+
+method description($name='An entity with this trait')
+{
+    return "$name can move."
+}
+
 apply Game::Trait;
 
 no warnings qw(experimental::builtin);
 use builtin qw(true false);
 use feature qw(say);
-use Carp;
 use Data::Printer;
 use Game::Domain::Point;
 
