@@ -7,10 +7,9 @@ no warnings qw(experimental::builtin);
 
 use builtin qw(blessed);
 use Data::Printer;
-use List::Util qw(first);
+use List::Util qw(all first);
 
 field %entities;
-field %types;
 field $width :reader :param=100;
 field $height :reader :param=100;
 
@@ -22,15 +21,20 @@ method get_instance :common (%params)
 
 method add_entity ($entity) {
     $entities{$entity->id()} = $entity;
-    $types{blessed $entity} = $entity;
 }
 
 method get_entity_by_id($id) {
     return $entities{$id};
 }
 
-method get_entities_by_type($type) {
-    return $types{$type};
+method get_entities_by_type(@type)
+{
+    return
+        grep {
+            my %pt = map { $_ => 1 } $_->property_types();
+            all { exists $pt{$_} } @type
+        }
+        values %entities;
 }
 
 method get_entity_at($point)
@@ -39,6 +43,16 @@ method get_entity_at($point)
         first {
             my $pos = $_->do('get_position');
             $pos->equals_to($point)
+        }
+        values %entities
+}
+
+method get_entities_in_range($point, $distance)
+{
+    return
+        grep {
+            my $pos = $_->do('get_position');
+            $pos->distance_to($point) <= $distance
         }
         values %entities
 }
@@ -62,8 +76,8 @@ method loop(@commands)
             $actor_to_commands{$id};
 
         my $response = $entity->update($commands_for_actor);
-        # p $response, as => 'response';
-        # p $entity, as => 'entity';
+        p $response, as => 'response';
+        p $entity, as => 'entity';
     }
 
     return

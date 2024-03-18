@@ -1,11 +1,12 @@
 use v5.38;
-no warnings qw(experimental::builtin);
 
 use local::lib;
 
 use Object::Pad;
 
 class Game::Domain::Point;
+
+no warnings qw(experimental::builtin);
 use builtin qw(true false);
 use feature qw(say);
 use Data::Printer;
@@ -49,5 +50,15 @@ method equals_to($other)
 {
     return false unless $other;
     return $x == $other->x() && $y == $other->y() && $z == $other->z();
+}
+
+method distance_to($other)
+{
+    return 0 unless $other;
+    return
+        sqrt(
+            ($x - $other->x())**2
+            + ($y - $other->y())**2
+            + ($z - $other->z())**2);
 }
 1;

@@ -54,14 +54,20 @@ field %shortcuts = (
 
 method move($entity, $direction)
 {
-    croak "No direction given"
-        unless $direction;
+    unless ($direction)
+    {
+        say "No direction given";
+        return
+    }
 
     $direction = $shortcuts{$direction}
         unless $movements{$direction};
 
-    croak("Invalid direction $direction")
-        unless $direction;
+    unless ($direction)
+    {
+        say "Invalid direction $direction";
+        return
+    }
 
     my $target_coords = $movements{$direction};
 

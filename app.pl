@@ -11,6 +11,8 @@ use Game::Entity;
 use Game::Property::Mobile;
 use Game::Property::Named;
 use Game::Property::Position;
+use Game::Property::Sight;
+use Game::Property::Visible;
 use Game::World;
 use Game::Command;
 
@@ -25,6 +27,8 @@ my $bob = Game::Entity->new(
         Game::Property::Named->new(name => 'Bob'),
         Game::Property::Position->new(position => [1,1,0]),
         Game::Property::Mobile->new(),
+        Game::Property::Visible->new(description =>'Bob is a nice guy.'),
+        Game::Property::Sight->new(),
     ]);
 
 $world->add_entity($bob);
@@ -32,11 +36,26 @@ $world->add_entity($bob);
 my $tree = Game::Entity->new(
     id => 'tree',
     properties => [
-        Game::Property::Named->new(name => 'a beautiful tree'),
+        Game::Property::Named->new(name => 'a tree'),
         Game::Property::Position->new(position => [5,5,0]),
+        Game::Property::Visible->new(
+            description => 'This beautiful tree is full of leaves, moving in the wind.')
+    ]);
+
+my $ghost = Game::Entity->new(
+    id => 'ghost',
+    properties => [
+        Game::Property::Named->new(name => 'Count Dracula'),
+        Game::Property::Position->new(position => [6,6,6]),
+        Game::Property::Visible->new(
+            visible => false,
+            description => 'Dracula is scarily invisible.'),
+        Game::Property::Sight->new(distance => 5),
     ]);
 
 $world->add_entity($tree);
+
+$bob->do('look_around');
 
 $SIG{INT} = sub { $stop_me = true };
 
@@ -53,12 +72,13 @@ until($stop_me)
 
     my ($actor, $action, @params) = split / /, $command;
 
-    my @commands = $actor && $action ?
-        Game::Command->new(
+    my @commands = $actor && $action
+        ? Game::Command->new(
             actor => $actor,
             action => $action,
             params => \@params
-        ) : ();
+        )
+        : ();
 
     $world->loop(@commands);
 }

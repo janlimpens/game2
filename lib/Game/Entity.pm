@@ -23,6 +23,11 @@ ADJUST
         for $initial_properties->@*;
 }
 
+method property_types()
+{
+    return keys %properties
+}
+
 method add_property($property)
 {
     $properties{blessed $property} = $property;
