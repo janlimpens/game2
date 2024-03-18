@@ -4,8 +4,8 @@ use local::lib;
 
 use Object::Pad;
 
-class Game::Property::Named;
-apply Game::Property;
+class Game::Trait::Named;
+apply Game::Trait;
 no warnings qw(experimental::builtin);
 use builtin qw(true false);
 use feature qw(say);

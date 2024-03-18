@@ -10,8 +10,8 @@ use Data::Printer;
 use Log::Log4perl qw(get_logger);;
 
 field $id :reader :param=undef;
-field %properties;
-field $initial_properties :param(properties)=[];
+field %traits;
+field $initial_traits :param(traits)=[];
 
 my $count = 1;
 
@@ -19,18 +19,18 @@ ADJUST
 {
     $id //= $count++;
 
-    $self->add_property($_)
-        for $initial_properties->@*;
+    $self->add_trait($_)
+        for $initial_traits->@*;
 }
 
-method property_types()
+method trait_types()
 {
-    return keys %properties
+    return keys %traits
 }
 
-method add_property($property)
+method add_trait($trait)
 {
-    $properties{blessed $property} = $property;
+    $traits{blessed $trait} = $trait;
 }
 
 method abilities()
@@ -38,7 +38,7 @@ method abilities()
     my @abs =
         sort
         map { $_->abilities()->@* }
-        values %properties;
+        values %traits;
 
     return \@abs;
 }
@@ -50,22 +50,22 @@ method has_ability($ability)
         $self->abilities()->@*
 }
 
-method find_property_with_ability($ability)
+method find_trait_with_ability($ability)
 {
-    my @found_properties =
+    my @found_traits =
         grep { $_->has_ability($ability) }
-        values %properties;
+        values %traits;
 
-    return @found_properties < 2
-        ? $found_properties[0]
-        : croak("Entity $id has more than one property with ability $ability.");
+    return @found_traits < 2
+        ? $found_traits[0]
+        : croak("Entity $id has more than one trait with ability $ability.");
 }
 
 method do($ability, @params)
 {
-    if (my $property = $self->find_property_with_ability($ability))
+    if (my $trait = $self->find_trait_with_ability($ability))
     {
-        return $property->do($self, $ability, @params);
+        return $trait->do($self, $ability, @params);
     }
     $self->log(info => "Entity $id does not have ability $ability.");
 }
@@ -81,7 +81,7 @@ method update($commands)
                     $r ? ($c->stringify() => $r) : ()
                 }
                 grep { $c->actor() eq $id && $_->has_ability($c->action()) }
-                values %properties;
+                values %traits;
             %resp
         }
         $commands->@*;
@@ -93,7 +93,7 @@ method stringify()
 {
     return
         "Entity $id: "
-        . join(', ', map { $_->stringify() } values %properties)
+        . join(', ', map { $_->stringify() } values %traits)
         . "; Abilities: "
         . join(', ', $self->abilities()->@*)
 }

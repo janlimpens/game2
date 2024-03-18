@@ -2,8 +2,8 @@ use v5.38;
 use local::lib;
 use Object::Pad;
 
-class Game::Property::Visible;
-apply Game::Property;
+class Game::Trait::Visible;
+apply Game::Trait;
 
 no warnings qw(experimental::builtin);
 use builtin qw(true false);

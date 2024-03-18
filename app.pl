@@ -8,11 +8,11 @@ no warnings qw(experimental::builtin experimental::class);
 
 use Data::Printer;
 use Game::Entity;
-use Game::Property::Mobile;
-use Game::Property::Named;
-use Game::Property::Position;
-use Game::Property::Sight;
-use Game::Property::Visible;
+use Game::Trait::Mobile;
+use Game::Trait::Named;
+use Game::Trait::Position;
+use Game::Trait::Sight;
+use Game::Trait::Visible;
 use Game::World;
 use Game::Command;
 
@@ -23,34 +23,34 @@ my $world = Game::World->get_instance(heigh=>10, width=>10);
 
 my $bob = Game::Entity->new(
     id => 'bob',
-    properties => [
-        Game::Property::Named->new(name => 'Bob'),
-        Game::Property::Position->new(position => [1,1,0]),
-        Game::Property::Mobile->new(),
-        Game::Property::Visible->new(description =>'Bob is a nice guy.'),
-        Game::Property::Sight->new(),
+    traits => [
+        Game::Trait::Named->new(name => 'Bob'),
+        Game::Trait::Position->new(position => [1,1,0]),
+        Game::Trait::Mobile->new(),
+        Game::Trait::Visible->new(description =>'Bob is a nice guy.'),
+        Game::Trait::Sight->new(),
     ]);
 
 $world->add_entity($bob);
 
 my $tree = Game::Entity->new(
     id => 'tree',
-    properties => [
-        Game::Property::Named->new(name => 'a tree'),
-        Game::Property::Position->new(position => [5,5,0]),
-        Game::Property::Visible->new(
+    traits => [
+        Game::Trait::Named->new(name => 'a tree'),
+        Game::Trait::Position->new(position => [5,5,0]),
+        Game::Trait::Visible->new(
             description => 'This beautiful tree is full of leaves, moving in the wind.')
     ]);
 
 my $ghost = Game::Entity->new(
     id => 'ghost',
-    properties => [
-        Game::Property::Named->new(name => 'Count Dracula'),
-        Game::Property::Position->new(position => [6,6,6]),
-        Game::Property::Visible->new(
+    traits => [
+        Game::Trait::Named->new(name => 'Count Dracula'),
+        Game::Trait::Position->new(position => [6,6,6]),
+        Game::Trait::Visible->new(
             visible => false,
             description => 'Dracula is scarily invisible.'),
-        Game::Property::Sight->new(distance => 5),
+        Game::Trait::Sight->new(distance => 5),
     ]);
 
 $world->add_entity($tree);

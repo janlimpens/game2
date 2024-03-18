@@ -2,7 +2,7 @@ use v5.38;
 use local::lib;
 use Object::Pad;
 
-role Game::Property;
+role Game::Trait;
 no warnings qw(experimental::builtin);
 use Data::Printer;
 

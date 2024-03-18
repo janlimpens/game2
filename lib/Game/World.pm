@@ -31,7 +31,7 @@ method get_entities_by_type(@type)
 {
     return
         grep {
-            my %pt = map { $_ => 1 } $_->property_types();
+            my %pt = map { $_ => 1 } $_->trait_types();
             all { exists $pt{$_} } @type
         }
         values %entities;

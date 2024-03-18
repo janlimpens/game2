@@ -2,8 +2,8 @@ use v5.38;
 use local::lib;
 use Object::Pad;
 
-class Game::Property::Sight;
-apply Game::Property;
+class Game::Trait::Sight;
+apply Game::Trait;
 
 no warnings qw(experimental::builtin);
 use builtin qw(true false);
@@ -44,8 +44,8 @@ method look_around($entity)
     my @candidates =
         grep { $_->id() ne $entity->id() }
         $world->get_entities_by_type(qw(
-            Game::Property::Position
-            Game::Property::Visible));
+            Game::Trait::Position
+            Game::Trait::Visible));
     # p @candidates, as => 'candidates';
 
     my @in_range =

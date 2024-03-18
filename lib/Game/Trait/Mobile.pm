@@ -2,8 +2,8 @@ use v5.38;
 use local::lib;
 use Object::Pad;
 
-class Game::Property::Mobile;
-apply Game::Property;
+class Game::Trait::Mobile;
+apply Game::Trait;
 
 no warnings qw(experimental::builtin);
 use builtin qw(true false);
