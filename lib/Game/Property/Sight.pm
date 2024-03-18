@@ -27,32 +27,6 @@ ADJUST
     };
 }
 
-method approximate_direction($standpoint, $other)
-{
-    my %directions = (
-        'north' => [0, 1],
-        'north east' => [1, 1],
-        'east' => [1, 0],
-        'south east' => [1, -1],
-        'south' => [0, -1],
-        'south west' => [-1, -1],
-        'west' => [-1, 0],
-        'north west' => [-1, 1] );
-
-    my @distances =
-        sort { $a->[1] <=> $b->[1] }
-        map {
-            my $p = Game::Domain::Point->new(
-                x => $standpoint->x() + $directions{$_}->[0],
-                y => $standpoint->y() + $directions{$_}->[1]);
-            my $d = $other->distance_to($p);
-            [$_, $d]
-        }
-        keys %directions;
-
-    return $distances[0][0]
-}
-
 method look_around($entity)
 {
     my $name = $entity->do('get_name') // $entity->id();
@@ -96,7 +70,7 @@ method look_around($entity)
         my ($p, $d, $e) = $_->@*;
         my $name = $e->do('get_name');
         my $description = $e->do('get_description');
-        my $dir = $self->approximate_direction($position, $p);
+        my $dir = $position->approximate_direction_of($p);
         say "In the $dir, there is $name. $description";
     }
 

@@ -61,4 +61,31 @@ method distance_to($other)
             + ($y - $other->y())**2
             + ($z - $other->z())**2);
 }
+
+method approximate_direction_of($other)
+{
+    my %directions = (
+        'north' => [0, 1],
+        'north east' => [1, 1],
+        'east' => [1, 0],
+        'south east' => [1, -1],
+        'south' => [0, -1],
+        'south west' => [-1, -1],
+        'west' => [-1, 0],
+        'north west' => [-1, 1] );
+
+    my @distances =
+        sort { $a->[1] <=> $b->[1] }
+        map {
+            my $p = Game::Domain::Point->new(
+                x => $x + $directions{$_}->[0],
+                y => $y + $directions{$_}->[1]);
+            my $d = $other->distance_to($p);
+            [$_, $d]
+        }
+        keys %directions;
+
+    return $distances[0][0]
+}
+
 1;
