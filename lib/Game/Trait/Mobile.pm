@@ -1,15 +1,9 @@
 use v5.38;
 use local::lib;
+use lib qw(lib);
 use Object::Pad;
 
 class Game::Trait::Mobile;
-
-method description($name='An entity with this trait')
-{
-    return "$name can move."
-}
-
-apply Game::Trait;
 
 no warnings qw(experimental::builtin);
 use builtin qw(true false);
@@ -17,17 +11,16 @@ use feature qw(say);
 use Data::Printer;
 use Game::Domain::Point;
 
+field $last_direction;
+
 ADJUST
 {
     my %abilities = (
-        move =>
-            method($entity, @params)
-            {
-                my $p = $params[1]
-                    ? join('_', $params[0..1])
-                    : $params[0];
-                $self->move($entity, $p)
-            }
+        move => \&move,
+        walk => \&move,
+        go => \&move,
+        run => \&move,
+        tiptoe => \&move,
     );
     for my $ability (keys %abilities)
     {
@@ -57,8 +50,26 @@ field %shortcuts = (
     nw => 'north_west',
 );
 
-method move($entity, $direction)
+method description($name='An entity with this trait')
 {
+    return "$name can move."
+}
+
+method stringify()
+{
+    return sprintf "Mobile";
+}
+
+method update($entity, $iteration)
+{
+}
+
+method move($entity, @params)
+{
+    my $direction = $params[1]
+        ? join('_', $params[0..1])
+        : $params[0];
+
     unless ($direction)
     {
         say "No direction given";
@@ -70,9 +81,11 @@ method move($entity, $direction)
 
     unless ($direction)
     {
-        say "Invalid direction $direction";
+        say "Invalid direction given.";
         return
     }
+
+    $last_direction = $direction;
 
     my $target_coords = $movements{$direction};
 
@@ -86,8 +99,6 @@ method move($entity, $direction)
         return
     }
 
-    say "$called tries to move $direction.";
-
     my $position = $entity->do('get_position');
 
     unless ($position)
@@ -96,32 +107,22 @@ method move($entity, $direction)
         return
     }
 
+    # say "$called tries to move $direction.";
+
     my $target = Game::Domain::Point->new_from_values(
         $position->x() + $target_coords->[0],
         $position->y() + $target_coords->[1],
     );
 
-    my $world = Game::World->get_instance();
-
-    my $is_occupied = $world->get_entity_at($target);
-    my $t = $target->stringify();
-
-    if($is_occupied)
-    {
-        my $occupant =
-            $is_occupied->do('get_name') // $is_occupied->id();
-        say "Position $t is already occupied by $occupant. $called can't move there.";
-        return
-    }
-
     $entity->do('set_position', $target);
-    say "$called moved $direction. ${called}'s position is now $t.";
+
+    $self->is_dirty(true);
+
+    # say "$called moved $direction.";
+
     return
 }
 
-method stringify()
-{
-    return sprintf "Mobile";
-}
+apply Game::Trait;
 
 1;

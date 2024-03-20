@@ -10,6 +10,7 @@ field $is_dirty :accessor :param=!1;
 field %abilities;
 
 method description;
+method update;
 
 method abilities()
 {
@@ -35,14 +36,6 @@ method do($entity, $action, @params)
         return $action->($self, $entity, @params)
     }
     return
-}
-
-method update($entity, $command)
-{
-    if (my $action = $abilities{$command->action()})
-    {
-        return $action->($self, $entity, $command->params()->@*);
-    }
 }
 
 1;

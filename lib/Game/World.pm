@@ -5,13 +5,24 @@ use Object::Pad;
 class Game::World;
 no warnings qw(experimental::builtin);
 
-use builtin qw(blessed);
+use builtin qw(blessed true false);
 use Data::Printer;
 use List::Util qw(all first);
+use Term::ANSIColor;
 
 field %entities;
 field $width :reader :param=100;
 field $height :reader :param=100;
+field $quit=false;
+
+method should_quit() {
+    return $quit
+}
+
+method quit()
+{
+    $quit = true;
+}
 
 method get_instance :common (%params)
 {
@@ -57,29 +68,19 @@ method get_entities_in_range($point, $distance)
         values %entities
 }
 
-method loop(@commands)
+method update($i)
 {
-    my %actor_to_commands;
-    for my $command (@commands)
-    {
-        my $actor = $command->actor();
-        push $actor_to_commands{$actor}->@*, $command;
-    }
+    say "Iteration $i";
 
-    # p %actor_to_commands, as => 'actor_to_command';
-
+    print color( join '', 'rgb', ( map { int(2 + rand(3)) } (0..2) ) );
+    
     for my $entity (values %entities)
     {
-        my $id = $entity->id();
-
-        my $commands_for_actor =
-            $actor_to_commands{$id};
-
-        my $response = $entity->update($commands_for_actor);
-        p $response, as => 'response';
-        p $entity, as => 'entity';
+        $entity->update($i);
     }
 
+    print color('reset');
+    say '-' x 80;
     return
 }
 

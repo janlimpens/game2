@@ -1,12 +1,22 @@
 use v5.38;
 use local::lib;
 use Object::Pad;
-
+use lib qw(lib);
 class Game::Trait::Sight;
 
 method description($name='An entity with this trait')
 {
     return "$name can see."
+}
+
+method stringify()
+{
+    return sprintf "Sight";
+}
+
+method update($entity, $iteration)
+{
+    return
 }
 
 apply Game::Trait;
@@ -45,10 +55,12 @@ method look_around($entity)
         return
     }
 
+    say "$name takes some time to look around.";
+
     my $world = Game::World->get_instance();
 
     my @candidates =
-        grep { $_->id() ne $entity->id() }
+        grep { $_->id() ne $entity->id() && $_->do('is_visible')}
         $world->get_entities_by_type(qw(
             Game::Trait::Position
             Game::Trait::Visible));
@@ -67,7 +79,7 @@ method look_around($entity)
 
     unless (@in_range)
     {
-        say "$name can't see anything from here.";
+        say "$name can't see anything special from here.";
         return
     }
 
@@ -103,11 +115,6 @@ method look_at($entity, $target)
     {
         say "$name can't quite see $target from here.";
     }
-}
-
-method stringify()
-{
-    return sprintf "Sight";
 }
 
 1;

@@ -1,16 +1,9 @@
 use v5.38;
 use local::lib;
 use Object::Pad;
+use lib qw(lib);
 
 class Game::Trait::Visible;
-
-method description($name='An entity with this trait')
-{
-    return "$name can define its visibility. Visible things have a description"
-}
-
-apply Game::Trait;
-
 no warnings qw(experimental::builtin);
 use builtin qw(true false);
 use feature qw(say);
@@ -18,6 +11,23 @@ use Data::Printer;
 
 field $my_description :param(description)='';
 field $visible :param=1;
+
+method description($name='An entity with this trait')
+{
+    return "$name can define its visibility. Visible things have a description"
+}
+
+method stringify()
+{
+    return sprintf "Visible ($visible)";
+}
+
+method update($entity, $iteration)
+{
+    return
+}
+
+apply Game::Trait;
 
 ADJUST
 {
@@ -39,11 +49,6 @@ ADJUST
     {
         $self->add_ability($ability, $method);
     };
-}
-
-method stringify()
-{
-    return sprintf "Visible ($visible)";
 }
 
 1;

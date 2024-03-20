@@ -28,6 +28,11 @@ method trait_types()
     return keys %traits
 }
 
+method has_trait($trait)
+{
+    return exists $traits{$trait};
+}
+
 method add_trait($trait)
 {
     $traits{blessed $trait} = $trait;
@@ -67,26 +72,13 @@ method do($ability, @params)
     {
         return $trait->do($self, $ability, @params);
     }
-    $self->log(info => "Entity $id does not have ability $ability.");
+    # $self->log(info => "Entity $id does not have ability $ability.");
 }
 
-method update($commands)
+method update($i)
 {
-    my %responses =
-        map {
-            my $c = $_;
-            my %resp =
-                map {
-                    my $r = $_->update($self, $c);
-                    $r ? ($c->stringify() => $r) : ()
-                }
-                grep { $c->actor() eq $id && $_->has_ability($c->action()) }
-                values %traits;
-            %resp
-        }
-        $commands->@*;
-
-    return \%responses
+    $_->update($self, $i)
+        for values %traits;
 }
 
 method stringify()
@@ -100,7 +92,7 @@ method stringify()
 
 method log($level, $message)
 {
-    get_logger('Game::Entity')->$level($message);
+    # get_logger('Game::Entity')->$level($message);
 }
 
 1;

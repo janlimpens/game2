@@ -5,13 +5,6 @@ use local::lib;
 use Object::Pad;
 
 class Game::Trait::Named;
-
-method description($name='An entity with this trait')
-{
-    return "$name has a name. It can be changed, if mutable is set to true."
-}
-
-apply Game::Trait;
 no warnings qw(experimental::builtin);
 use builtin qw(true false);
 use feature qw(say);
@@ -19,6 +12,23 @@ use Data::Printer;
 
 field $name :param;
 field $mutable :param=true;
+
+method description($name='An entity with this trait')
+{
+    return "$name has a name. It can be changed, if mutable is set to true."
+}
+
+method stringify()
+{
+    return sprintf "Name ($name)";
+}
+
+method update($entity, $iteration)
+{
+    return
+}
+
+apply Game::Trait;
 
 ADJUST
 {
@@ -38,11 +48,6 @@ ADJUST
     {
         $self->add_ability($ability, $abilities{$ability});
     }
-}
-
-method stringify()
-{
-    return sprintf "Name ($name)";
 }
 
 1;
