@@ -9,7 +9,7 @@ use Data::Printer;
 field $is_dirty :accessor :param=!1;
 field %abilities;
 
-method description;
+method description :common ;
 method update;
 
 method abilities()
