@@ -10,6 +10,7 @@ Here, objects are little more than an id to which diverse properties can be atta
 
 So, the typical animal -> cat relation could be described like this (not code):
 
+```
   entity animal
     trait body => weight, size, can be composed of other traits
     trait sight => look_around, look_at
@@ -19,15 +20,15 @@ So, the typical animal -> cat relation could be described like this (not code):
     ...
 
   animal->do(look_around) => "the animal can't see anything because it's night"
-
+```
 Now, we want this animal to become a cat
-
+```
   animal->add_trait(cat::voice)
   animal->add_trait(night_sight)
   ...
 
   animal->do(look_around) => "there is a mouse!"
-
+```
 Some traits require others to work, but their relationship is always simple and always component-like.
 For example, for an object to move, it needs a position. However this relation is true for every object which moves.
 So few complex hierarchies are necessary. From what I see, there is a tendency for very fine grained traits that take care of only one aspect and little interdependcy.
