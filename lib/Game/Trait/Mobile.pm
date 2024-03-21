@@ -50,7 +50,7 @@ field %shortcuts = (
     nw => 'north_west',
 );
 
-method description($name='An entity with this trait')
+method description :common ($name='An entity with this trait')
 {
     return "$name can move."
 }

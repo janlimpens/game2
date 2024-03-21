@@ -12,7 +12,7 @@ use Game::Domain::Point;
 
 field $last_direction;
 
-method description($name='An entity with this trait')
+method description :common ($name='An entity with this trait')
 {
     return "$name autonomously does random stuff."
 }

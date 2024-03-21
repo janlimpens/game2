@@ -13,7 +13,7 @@ use Game::Domain::Point;
 
 field $position :param=Game::Domain::Point->origin();
 
-method description($name='An entity with this trait')
+method description :common ($name='An entity with this trait')
 {
     return "$name has a position. It can be directly changed. It is not intended to be used directly, in regular situations."
 }

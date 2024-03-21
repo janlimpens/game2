@@ -13,7 +13,7 @@ use Game::Command;
 
 field %last_command;
 
-method description($name='An entity with this trait')
+method description :common ($name='An entity with this trait')
 {
     return "$name can be controlled by user commands."
 }

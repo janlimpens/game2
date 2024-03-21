@@ -4,7 +4,8 @@ use Object::Pad;
 use lib qw(lib);
 
 class Game::Trait::Visible;
-no warnings qw(experimental::builtin);
+
+no warnings qw(experimental::builtin experimental::for_list);
 use builtin qw(true false);
 use feature qw(say);
 use Data::Printer;
@@ -12,7 +13,7 @@ use Data::Printer;
 field $my_description :param(description)='';
 field $visible :param=1;
 
-method description($name='An entity with this trait')
+method description :common ($name='An entity with this trait')
 {
     return "$name can define its visibility. Visible things have a description"
 }

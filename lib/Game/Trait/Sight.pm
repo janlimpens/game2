@@ -4,7 +4,17 @@ use Object::Pad;
 use lib qw(lib);
 class Game::Trait::Sight;
 
-method description($name='An entity with this trait')
+no warnings qw(experimental::builtin experimental::for_list);
+use builtin qw(true false);
+use feature qw(say);
+use Data::Printer;
+use Game::World;
+
+field $distance :param=10;
+field $decrement :param=1;
+
+
+method description :common ($name='An entity with this trait')
 {
     return "$name can see."
 }
@@ -20,15 +30,6 @@ method update($entity, $iteration)
 }
 
 apply Game::Trait;
-
-no warnings qw(experimental::builtin);
-use builtin qw(true false);
-use feature qw(say);
-use Data::Printer;
-use Game::World;
-
-field $distance :param=10;
-field $decrement :param=1;
 
 ADJUST
 {

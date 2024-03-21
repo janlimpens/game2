@@ -13,7 +13,7 @@ use Data::Printer;
 field $name :param;
 field $mutable :param=true;
 
-method description($name='An entity with this trait')
+method description :common ($name='An entity with this trait')
 {
     return "$name has a name. It can be changed, if mutable is set to true."
 }

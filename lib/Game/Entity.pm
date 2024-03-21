@@ -4,7 +4,7 @@ use Object::Pad;
 
 class Game::Entity;
 no warnings qw(experimental::builtin);
-use builtin qw(blessed);
+use builtin qw(blessed true false);
 use Carp;
 use Data::Printer;
 use Log::Log4perl qw(get_logger);;
