@@ -38,6 +38,19 @@ method add_trait($trait)
     $traits{blessed $trait} = $trait;
 }
 
+method remove_trait($class)
+{
+    return delete $traits{$class};
+}
+
+method give_trait($other, $class)
+{
+    return $other->add_trait($self->remove_trait($class))
+        if $self->has_trait($class);
+
+    return false
+}
+
 method abilities()
 {
     my @abs =
