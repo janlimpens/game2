@@ -9,11 +9,8 @@ class Game::Domain::Point;
 no warnings qw(experimental::builtin);
 use builtin qw(true false);
 use feature qw(say);
+use Carp;
 use Data::Printer;
-
-# field $x :param//=0 :reader;
-# field $y :param//=0 :reader;
-# field $z :param//=0 :reader;
 
 field $x :reader :param//=0;
 field $y :reader :param//=0;
@@ -21,8 +18,9 @@ field $z :reader :param//=0;
 
 ADJUST
 {
-    $x = 0 if $x < 0;
-    $y = 0 if $y < 0;
+    $x = $x + 0;
+    $y = $y + 0;
+    $z = $z + 0;
 }
 
 method stringify()
@@ -64,6 +62,8 @@ method distance_to($other)
 
 method approximate_direction_of($other)
 {
+    return if $self->equals_to($other);
+
     my %directions = (
         'north' => [0, 1],
         'north east' => [1, 1],
