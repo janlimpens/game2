@@ -1,12 +1,20 @@
 ## A proposal for component architecture in Perl ##
 
-This is my take to avoid the usual pitfalls that class/inheritance based architectures pose. 
+This is my take to avoid the usual pitfalls that class/inheritance based
+architectures pose.
 
-Large inheritance trees become difficult to maintain and also the their inversion by the roles/traits concept becomes a burden, as traits aren't easily given or removed. It is sometimes difficult to plug extensions in the middle, without affecting toop much and thus creating new trees. This leads to very static objects that provide more than is necessary in the given situation and are unable to be extended during runtime.
+Classes are a bad abstraction of reality. Things change, classes don't. The
+cannot acquire new abilities and for a good reason, objects are being **cast**
+to classes. One you belong to a certain class it is impossible to get out of it
+without losing your identity.
 
-This project proposes a differnt structure.
+Large inheritance trees become difficult to maintain and also the their inversion by the roles/traits concept becomes a burden, as traits aren't easily given or removed. It is sometimes difficult to plug extensions in the middle, without affecting too much and thus creating new trees. This leads to very static objects that provide more than is necessary in the given situation and are unable to be extended during runtime.
 
-Here, objects are little more than an id to which diverse properties can be attached (and taken away). Traits, then provide abilities, which can be accessed by the object.
+This project proposes a different structure: a classless paradigm.
+
+Here, objects are little more than an id to which diverse properties can be
+attached (and taken away). Traits, then provide abilities (behavior) and
+properties (data), which the object can make use of.
 
 So, the typical animal -> cat relation could be described like this (not code):
 
@@ -33,4 +41,4 @@ Some traits require others to work, but their relationship is always simple and 
 For example, for an object to move, it needs a position. However this relation is true for every object which moves.
 So few complex hierarchies are necessary. From what I see, there is a tendency for very fine grained traits that take care of only one aspect and little interdependcy.
 
-This is Perl, because that's what I spend most time with, currently, however what I am learning holds true for most languages. 
+This is Perl, because that's what I spend most time with, currently, however what I am learning holds true for most languages.
