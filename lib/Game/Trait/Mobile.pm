@@ -123,6 +123,55 @@ method move($entity, @params)
     return
 }
 
+method _move_towards_point($entity, $target_position)
+{
+    my $position = $entity->do('get_position');
+
+    return unless $position;
+
+    return true if $position->equals_to($target_position);
+
+    my $direction = $position->approximate_direction_of($target_position);
+
+    $entity->do('move', $direction);
+
+    return $position->equals_to($target_position)
+}
+
+method _move_towards_entity($entity, $target)
+{
+    my $position = $entity->do('get_position');
+    my $other_pos = $target->do('get_position');
+
+    return unless $position || $other_pos;
+
+    my $distance = $position->distance($other_pos);
+
+    $self->_move_towards_point($other_pos)
+        if $distance > 1;
+
+    my $new_distance =
+        $entity
+        ->do('get_position')
+        ->distance($target->do('get_position'));
+
+    return $new_distance < 2
+}
+
+
+method go_to($entity, $target)
+{
+    return $self->_move_towards_point($entity, $target)
+        if $target->isa('Game::Domain::Position');
+
+    return $self->_move_towards_entity($entity, $target)
+        if $target->isa('Game::Entity');
+
+    return false
+}
+
+
+
 apply Game::Trait;
 
 1;

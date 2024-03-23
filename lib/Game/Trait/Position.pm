@@ -10,6 +10,7 @@ use feature qw(say);
 use Carp;
 use Data::Printer;
 use Game::Domain::Point;
+use Game::World;
 
 field $position :param=Game::Domain::Point->origin();
 

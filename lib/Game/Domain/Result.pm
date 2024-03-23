@@ -7,7 +7,6 @@ class Game::Domain::Result;
 no warnings qw(experimental::builtin);
 use builtin qw(true false blessed);
 use Carp;
-use Syntax::Operator::Equ;
 
 field $error :reader :param=undef;
 field $some :reader :param=undef;
@@ -22,9 +21,29 @@ ADJUST
         if !defined $error && !defined $some;
 }
 
-method was_success()
+method with_error :common ($error)
 {
-    return defined $some;
+    return $class->new(error => $error)
+}
+
+method with_some :common ($some)
+{
+    return $class->new(some => $some)
+}
+
+method unwrap()
+{
+    croak 'No value to unwrap'
+        unless defined $some;
+
+    return ref $some eq 'CODE'
+        ? $some->()
+        : $some
+}
+
+method was_successful()
+{
+    return defined $some
 }
 
 1;
