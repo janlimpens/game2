@@ -1,5 +1,5 @@
 #! /usr/bin/env perl
-no warnings qw(experimental::builtin);
+use v5.38;
 use Test2::V0;
 use Test2::Tools::Exception qw(dies lives);
 use local::lib;
@@ -7,6 +7,8 @@ use lib 'lib';
 use builtin qw(true false);
 use Data::Printer;
 use Game::Domain::Result;
+
+no warnings qw(experimental::builtin);
 
 subtest 'Game::Domain::Result' => sub
 {

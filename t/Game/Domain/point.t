@@ -1,4 +1,5 @@
 #! /usr/bin/env perl
+use v5.38;
 use Test2::V0;
 use Test2::Tools::Exception qw(dies lives);
 use local::lib;
