@@ -63,7 +63,7 @@ subtest 'Game::Trait::Planning' => sub
 
     my $direction_gone = $position->approximate_direction_of($position_after_update);
 
-    is $direction_gone, 'north', 'direction gone is north';
+    is $direction_gone, 'n', 'direction gone is north';
 };
 
 done_testing();

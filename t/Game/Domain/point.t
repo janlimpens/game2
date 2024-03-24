@@ -1,5 +1,4 @@
 #! /usr/bin/env perl
-no warnings qw(experimental::builtin);
 use Test2::V0;
 use Test2::Tools::Exception qw(dies lives);
 use local::lib;
@@ -7,6 +6,7 @@ use lib 'lib';
 use builtin qw(true false);
 use Data::Printer;
 use Game::Domain::Point;
+no warnings qw(experimental::builtin);
 
 subtest 'Game::Domain::Point' => sub
 {
@@ -54,10 +54,10 @@ subtest approximate_direction_of => sub
     is $p1->approximate_direction_of($p2), undef, 'approximate_direction_of()';
 
     my $p3 = Game::Domain::Point->new(y => 5);
-    is $p1->approximate_direction_of($p3), 'north', 'approximate_direction_of()';
+    is $p1->approximate_direction_of($p3), 'n', 'approximate_direction_of()';
 
     my $p4 = Game::Domain::Point->new(x => 5, y => 5);
-    is $p1->approximate_direction_of($p4), 'north east', 'approximate_direction_of()';
+    is $p1->approximate_direction_of($p4), 'ne', 'approximate_direction_of()';
 };
 
 done_testing();

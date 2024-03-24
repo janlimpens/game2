@@ -1,7 +1,7 @@
 use v5.38;
 
 use local::lib;
-
+use lib 'lib';
 use Object::Pad;
 
 class Game::Domain::Point;
@@ -11,6 +11,7 @@ use builtin qw(true false);
 use feature qw(say);
 use Carp;
 use Data::Printer;
+use Game::Domain::Direction;
 
 field $x :reader :param//=0;
 field $y :reader :param//=0;
@@ -64,26 +65,18 @@ method approximate_direction_of($other)
 {
     return if $self->equals_to($other);
 
-    my %directions = (
-        'north' => [0, 1],
-        'north east' => [1, 1],
-        'east' => [1, 0],
-        'south east' => [1, -1],
-        'south' => [0, -1],
-        'south west' => [-1, -1],
-        'west' => [-1, 0],
-        'north west' => [-1, 1] );
-
     my @distances =
         sort { $a->[1] <=> $b->[1] }
         map {
+            my $d = Game::Domain::Direction->direction($_);
+            my $offset = $d->offset();
             my $p = Game::Domain::Point->new(
-                x => $x + $directions{$_}->[0],
-                y => $y + $directions{$_}->[1]);
-            my $d = $other->distance_to($p);
-            [$_, $d]
+                x => $x + $offset->[0],
+                y => $y + $offset->[1]);
+            my $dist = $other->distance_to($p);
+            [$_, $dist]
         }
-        keys %directions;
+        Game::Domain::Direction->directions()->@*;
 
     return $distances[0][0]
 }
