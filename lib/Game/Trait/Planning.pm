@@ -20,15 +20,20 @@ method description :common ($name='An entity with this trait')
     return "$name be assigned tasks and will try to perform across a period until completion."
 }
 
-method queue_task($entity, $task)
+method queue_task($task)
 {
     return Game::Domain::Result->with_error('Task required')
         unless $task;
 
-    return Game::Domain::Result->with_some(push @tasks, $task);
+    return Game::Domain::Result->with_error('Game::Domain::Task required')
+        unless $task->isa('Game::Domain::Task');
+
+    push @tasks, $task;
+
+    return Game::Domain::Result->with_some($task)
 }
 
-method current_task($entity)
+method current_task()
 {
     if (my $t = $tasks[0]) {
         return $t;
@@ -37,34 +42,22 @@ method current_task($entity)
 
 method update($entity, $iteration)
 {
-    my $task = $self->current_task($entity);
-    if ($task)
+    if (my $task = $self->current_task())
     {
-        if (my $command = $task->current_step())
-        {
-            my $result =
-                $entity->do($command->action(), $command->params()->@*);
-
-            if (ref $result eq 'Game::Domain::Result' && $result->was_successful()){
-                $task->next_step();
-            } elsif ($result) {
-                $task->next_step();
-            }
-        }
-        else
-        {
-            $task->complete();
-            shift @tasks;
-        }
+$DB::single=1;
+        $task->update($entity, $iteration);
+        shift @tasks
+            if $task->done();
     }
+    return
 }
 
 apply Game::Trait;
 
 ADJUST
 {
-    $self->add_ability( queue_task => \&queue_task );
-    $self->add_ability( current_task => \&current_task );
+    $self->add_ability( queue_task => sub($entity, @tasks) { $self->queue_task($_) for @tasks } );
+    $self->add_ability( current_task => sub($entity, @params) { return $self->current_task() } );
 }
 
 1;

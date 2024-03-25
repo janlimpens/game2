@@ -1,5 +1,5 @@
 #! /usr/bin/env perl
-no warnings qw(experimental::builtin);
+use v5.38;
 use Test2::V0;
 use Test2::Tools::Exception qw(dies lives);
 use local::lib;
@@ -11,6 +11,7 @@ use Game::Domain::Task;
 use Game::Trait::Planning;
 use Game::Trait::Mobile;
 use Game::Trait::Position;
+no warnings qw(experimental::builtin);
 
 subtest 'Game::Trait::Planning' => sub
 {
@@ -38,32 +39,36 @@ subtest 'Game::Trait::Planning' => sub
 
     is $entity->do('current_task'), undef, 'current_task is undef';
 
-    ok my $r1 = $entity->do('queue_task', Game::Domain::Task->new(
-        steps => [
-            map { Game::Command->new(
+    my $task = Game::Domain::Task->new(
+        do => Game::Command->new(
                 actor => $entity,
                 action => 'go',
-                params => ['n']
-            )}
-            (1..3)
-        ]
-    )), 'queue_task returns result';
+                params => ['n']),
+        while => sub($entity, $iteration)
+        {
+            my $pos = $entity->do('get_position');
+            return $pos->y() <= $position->y() + 2
+        });
 
-    ok $r1->was_successful(), 'queue_task was successful';
-
-    ok my $current_task = $entity->do('current_task'), 'current_task is defined';
-
-    ok my $step = $current_task->current_step(), 'current_step is defined';
-
-    is $step->action(), 'go', 'step action is go';
+    $entity->do('queue_task', $task);
 
     $entity->update(1);
 
-    my $position_after_update = $entity->do('get_position');
+    my $pos_after_1 = $entity->do('get_position');
 
-    my $direction_gone = $position->approximate_direction_of($position_after_update);
+    is $pos_after_1->y(), $position->y()+1, 'moved north';
 
-    is $direction_gone, 'n', 'direction gone is north';
+    $entity->update(2);
+
+    my $pos_after_2 = $entity->do('get_position');
+
+    is $pos_after_2->y(), $position->y()+2, 'moved north again';
+
+    $entity->update(3);
+
+    my $pos_after_3 = $entity->do('get_position');
+
+    ok $pos_after_3, $pos_after_2, 'stopped moving';
 };
 
 done_testing();

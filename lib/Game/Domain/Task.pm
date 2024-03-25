@@ -1,7 +1,6 @@
+
 use v5.38;
-
 use local::lib;
-
 use Object::Pad;
 
 class Game::Domain::Task;
@@ -12,21 +11,33 @@ use feature qw(say);
 use Carp;
 use Data::Printer;
 
-field $steps :param //= [];
-field $current = 0;
-# field $importance :param //= 1;
-# field $params :param //= {};
+field $do :param;
+field $while :param;
+field $done=false;
+field $max_iterations :param=undef;
 
-method current_step()
+method done()
 {
-    return $steps->[$current]
+    return $done
 }
 
-method next_step()
+method update($entity, $iteration)
 {
-    return unless $steps->@* >= $current;
-    $current++;
-    return $steps->[$current]
+    return if $done;
+
+    if (defined $max_iterations && $iteration >= $max_iterations)
+    {
+        return $done = true;
+    }
+
+    if ($while->($entity, $iteration))
+    {
+        return $entity->do( $do->action(), $do->params()->@* );
+    }
+    else
+    {
+        return $done = true;
+    }
 }
 
 1;

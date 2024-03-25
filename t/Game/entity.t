@@ -1,11 +1,12 @@
 #! /usr/bin/env perl
-no warnings qw(experimental::builtin);
+use v5.38;
 use Test2::V0;
 use local::lib;
 use lib qw(lib);
 use builtin qw(true false);
 use Game::Entity;
 use Game::Trait::Body;
+no warnings qw(experimental::builtin);
 
 subtest 'Game::Entity initialization' => sub
 {
