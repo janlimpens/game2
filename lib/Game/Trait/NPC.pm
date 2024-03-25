@@ -30,7 +30,8 @@ method update($entity, $iteration)
         repeat_last_movement => \&repeat_last_movement,
     );
 
-    my $action = [keys %actions]->[int(rand(scalar %actions))];
+    #random
+    my ($action) = keys %actions;
 
     return $actions{$action}->($self, $entity);
 }
@@ -97,7 +98,7 @@ method walk_aimlessly($entity)
         ? map { $_ => 1 } grep { !$vicinity->{$_} } keys $vicinity->%*
         : ();
 
-    my $direction = [keys %open_directions]->[int(rand(8))];
+    my ($direction) = keys %open_directions;
 
     return $self->stand_around($entity)
         unless $direction;
@@ -114,6 +115,6 @@ method walk_aimlessly($entity)
     return
 }
 
-apply Game::Trait;
+apply Game::Role::Trait;
 
 1;

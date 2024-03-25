@@ -1,8 +1,9 @@
 use v5.38;
 use local::lib;
+use lib qw(lib);
 use Object::Pad;
 
-class Game::World;
+class Game::World :isa( Game::Entity );
 no warnings qw(experimental::builtin);
 
 use builtin qw(blessed true false);
@@ -53,7 +54,7 @@ method get_entity_at($point)
     return
         first {
             my $pos = $_->do('get_position');
-            $pos->equals_to($point)
+            $pos ? $pos->equals_to($point) : false
         }
         values %entities
 }
@@ -73,7 +74,7 @@ method update($i)
     say "Iteration $i";
 
     print color( join '', 'rgb', ( map { int(2 + rand(3)) } (0..2) ) );
-    
+
     for my $entity (values %entities)
     {
         $entity->update($i);

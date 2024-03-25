@@ -10,7 +10,7 @@ use feature qw(say);
 use Data::Printer;
 use Game::World;
 
-field $distance :param=10;
+field $max_distance :param=10;
 field $decrement :param=1;
 
 
@@ -29,7 +29,7 @@ method update($entity, $iteration)
     return
 }
 
-apply Game::Trait;
+apply Game::Role::Trait;
 
 ADJUST
 {
@@ -72,7 +72,7 @@ method look_around($entity)
         map {
             my $p = $_->do('get_position');
             my $d = $p->distance_to($position);
-            $d <= $distance
+            $d <= $max_distance
                 ? ([$p, $d, $_])
                 : ()
         }
@@ -96,20 +96,34 @@ method look_around($entity)
     return @in_range
 }
 
+method can_see($entity, $target)
+{
+    return unless $entity;
+    return unless $target;
+
+    return unless
+        my $own_position = $entity->do('get_position');
+
+    return unless
+        my $target_position = $target->do('get_position');
+
+    my $distance = $target_position->distance($own_position);
+
+    return $distance <= $max_distance
+        ? $target
+        : false
+}
+
 method look_at($entity, $target)
 {
     my $position = $entity->do('get_position');
-    return unless $position;
-
-    my $name = $entity->do('get_name') // $entity->id();
-
-    my $p = $target->do('get_position');
-    my $d = $p->distance($position);
-
-    if ($d <= $distance)
+    my $name = $target->do('get_name') // $target->id();
+    if ($self->can_see($entity, $target))
     {
         my $description = $target->do('get_description');
-        my $dir = $self->approximate_direction($position, $p);
+        my $t_pos = $target->do('get_position');
+        my $dir = $self->approximate_direction($position, );
+        my $d = $position->distance_to($t_pos);
         say "In the $dir, $d m away of $name, there is $name. $description";
     }
     else

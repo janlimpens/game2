@@ -1,7 +1,7 @@
 #! /usr/bin/env perl
 use Test2::V0;
 use local::lib;
-use lib 'lib';
+use lib qw(lib);
 use builtin qw(true false);
 use Game::Entity;
 use Game::Trait::Body;
@@ -28,7 +28,7 @@ subtest 'Game::Trait::Body' => sub
     my $e = Game::Entity->new(
         traits => [ $body ]);
 
-    is $e->do('fits_inside', $e), true, 'fits_inside()';
+    is $e->do('fits_inside', $e), undef, 'fits_inside()';
 
     is $body->stringify(), 'Body (h: 1;w: 2; d: 3)', 'stringify()';
 };

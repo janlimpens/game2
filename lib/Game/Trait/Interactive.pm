@@ -9,7 +9,7 @@ use builtin qw(true false);
 use feature qw(say);
 use Carp;
 use Data::Printer;
-use Game::Command;
+use Game::Domain::Command;
 
 field %last_command;
 
@@ -59,7 +59,7 @@ method update($entity, $iteration)
     {
         my ($action, @params) = split / /, $input;
 
-        $cmd = Game::Command->new(
+        $cmd = Game::Domain::Command->new(
                 actor => $entity->id(),
                 action => $action,
                 params => \@params)
@@ -95,7 +95,7 @@ method stringify()
     return sprintf "Interactive";
 }
 
-apply Game::Trait;
+apply Game::Role::Trait;
 
 # ADJUST {};
 

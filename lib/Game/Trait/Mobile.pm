@@ -170,8 +170,6 @@ method go_to($entity, $target)
     return false
 }
 
-
-
-apply Game::Trait;
+apply Game::Role::Trait;
 
 1;

@@ -2,19 +2,21 @@ use v5.38;
 use local::lib;
 use Object::Pad;
 
-role Game::Trait;
+role Game::Role::Trait;
+
 no warnings qw(experimental::builtin);
 use Data::Printer;
 
 field $is_dirty :accessor :param=!1;
 field %abilities;
 
-method description :common ;
+method description :common;
+
 method update;
 
 method abilities()
 {
-    return [sort keys %abilities]
+    return sort keys %abilities
 }
 
 method has_ability($action)

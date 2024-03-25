@@ -12,7 +12,7 @@ subtest 'Game::Entity initialization' => sub
 {
     my $entity = Game::Entity->new();
 
-    is $entity->abilities(), [], 'get_abilities()';
+    is [$entity->abilities()], [], 'get_abilities()';
 
     my $trait = Game::Trait::Body->new(
         height => 2,
@@ -21,7 +21,7 @@ subtest 'Game::Entity initialization' => sub
 
     $entity->add_trait($trait);
 
-    is $entity->abilities(), [sort qw(
+    is [$entity->abilities()], [sort qw(
         diameter
         fits_inside
         fits_through
@@ -32,7 +32,7 @@ subtest 'Game::Entity initialization' => sub
 
     $entity->remove_trait('Game::Trait::Body');
 
-    is $entity->abilities(), [], 'get_abilities()';
+    is [$entity->abilities()], [], 'get_abilities()';
 };
 
 done_testing();

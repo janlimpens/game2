@@ -29,7 +29,7 @@ method update($entity, $iteration)
     return
 }
 
-apply Game::Trait;
+apply Game::Role::Trait;
 
 ADJUST
 {
