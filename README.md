@@ -16,7 +16,8 @@ Here, objects are little more than an id to which diverse properties can be
 attached (and taken away). Traits, then provide abilities (behavior) and
 properties (data), which the object can make use of.
 
-So, the typical animal -> cat relation could be described like this (not code):
+So, the typical animal -> cat relation could be described like this (easier to
+read pseudo script language, not actual code):
 
 ```
   entity animal
@@ -27,18 +28,28 @@ So, the typical animal -> cat relation could be described like this (not code):
     trait live => grow, die, decompose, ...
     ...
 
-  animal->do(look_around) => "the animal can't see anything because it's night"
+  animal->do(look_around) => "I can't see anything because it's night and my eyesight won't permit it."
 ```
-Now, we want this animal to become a cat
+Now, we want for this animal to become a cat:
 ```
   animal->add_trait(cat::voice)
   animal->add_trait(night_sight)
-  ...
 
-  animal->do(look_around) => "there is a mouse!"
+  animal->do(say_hello) => "Miaou!"
+  animal->do(look_around) => "There is a mouse!"
 ```
-Some traits require others to work, but their relationship is always simple and always component-like.
+Some traits require others to work, yet their relationship remains simple and component-like.
 For example, for an object to move, it needs a position. However this relation is true for every object which moves.
-So few complex hierarchies are necessary. From what I see, there is a tendency for very fine grained traits that take care of only one aspect and little interdependcy.
+So few complex hierarchies are necessary. From what I see, there is a tendency
+for very fine grained traits, which take care of only one aspect and possess little
+interdependency.
 
-This is Perl, because that's what I spend most time with, currently, however what I am learning holds true for most languages.
+This is Perl, because that's what I spend most time with, currently, however
+what I am learning, must hold true for most languages. Due to the primitive
+dispatching mechanism, game2 uses, a flexible enough script language is a
+logical choice, and so far, I cannot complain about speed. Of course, I wouldn't
+write a device driver in it.
+
+Cheers,
+
+-Jan
