@@ -12,7 +12,7 @@ use Data::Printer;
 
 field $id :reader :param=undef;
 
-my $count = 1;
+my $count = 0;
 
 ADJUST
 {

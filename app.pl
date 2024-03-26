@@ -25,6 +25,7 @@ sub build_human(%args)
     my $diameter = delete $args{diameter}//1;
     my $height = delete $args{height}//2;
     my $name = delete $args{name};
+    $args{id} //= lc $name;
     my $position = delete $args{position} // Game::Domain::Point->origin();
     my $traits = delete $args{initial_traits} // [];
     my $width = delete $args{width}//1;

@@ -27,12 +27,12 @@ method stringify()
 
 method init($entity)
 {
-    $world->subscribe(move => sub($other_entity, $changes)
+    $world->subscribe(direction => sub($other_entity, $changes)
     {
         return if $other_entity->id() eq $entity->id();
         return unless $self->can_see($entity, $other_entity);
-        p $changes;
-        my $direction = $changes->{direction};
+        # p $changes;
+        my $direction = $changes;#->{direction};
         return $entity->id() . " sees " . $other_entity->id() . " moving $direction.";
     });
 
