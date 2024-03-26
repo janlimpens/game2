@@ -17,10 +17,7 @@ ADJUST
 {
     my %abilities = (
         move => \&move,
-        walk => \&move,
-        go => \&move,
-        run => \&move,
-        tiptoe => \&move,
+        go_to => \&go_to,
     );
     for my $ability (keys %abilities)
     {
@@ -122,11 +119,13 @@ method move($entity, @params)
 
     $entity->do('set_position', $target);
 
+    say $entity->do('get_position')->stringify();
+
     $self->is_dirty(true);
 
     # say "$called moved $direction.";
 
-    return
+    return true
 }
 
 method _move_towards_point($entity, $target_position)
@@ -135,13 +134,12 @@ method _move_towards_point($entity, $target_position)
 
     return unless $position;
 
-    return true if $position->equals_to($target_position);
+    return true
+        if $position->equals_to($target_position);
 
     my $direction = $position->approximate_direction_of($target_position);
 
-    $entity->do('move', $direction);
-
-    return $position->equals_to($target_position)
+    return $self->move($entity, $direction);
 }
 
 method _move_towards_entity($entity, $target)
@@ -161,9 +159,8 @@ method _move_towards_entity($entity, $target)
         ->do('get_position')
         ->distance($target->do('get_position'));
 
-    return $new_distance < 2
+    return $new_distance < $distance
 }
-
 
 method go_to($entity, $target)
 {

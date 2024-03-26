@@ -10,10 +10,9 @@ use builtin qw(true false);
 use feature qw(say);
 use Data::Printer;
 use Game::Domain::Result;
-use Game::Command;
+use Game::Domain::Command;
 
 field @tasks;
-# Game::Trait implementation
 
 method description :common ($name='An entity with this trait')
 {
@@ -44,7 +43,7 @@ method update($entity, $iteration)
 {
     if (my $task = $self->current_task())
     {
-$DB::single=1;
+        # $DB::single=1;
         $task->update($entity, $iteration);
         shift @tasks
             if $task->done();
@@ -52,7 +51,7 @@ $DB::single=1;
     return
 }
 
-apply Game::Trait;
+apply Game::Role::Trait;
 
 ADJUST
 {

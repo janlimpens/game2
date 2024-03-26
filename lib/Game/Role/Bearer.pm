@@ -4,7 +4,10 @@ use Object::Pad ':experimental(inherit_field)';
 
 role Game::Role::Bearer;
 
-no warnings qw(experimental::builtin experimental::try);
+no warnings qw(
+    experimental::builtin
+    experimental::try
+    experimental::for_list);
 use builtin qw(blessed true false);
 use feature qw(try);
 use Carp qw(carp cluck longmess);

@@ -4,12 +4,12 @@ use Test2::V0;
 use local::lib;
 use lib 'lib';
 use Game::Domain::Task;
-use Game::Command;
+use Game::Domain::Command;
 
 subtest 'Game::Domain::Direction' => sub
 {
     my $task = Game::Domain::Task->new(
-        do => Game::Command->new( actor => undef, action => 'go'),
+        do => Game::Domain::Command->new( actor => undef, action => 'go'),
         while => sub($entity, $i) { $i > 10 }
     );
 

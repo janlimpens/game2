@@ -32,8 +32,6 @@ method update($entity, $iteration)
 
     unless ($position->equals_to($last_position))
     {
-        p $position, as => 'position';
-        p $last_position, as => 'last_position';
         $changes{position} = $position;
         $last_position = $position;
     }
@@ -62,7 +60,6 @@ ADJUST
     } elsif (ref $position eq 'ARRAY')
     {
         $position = Game::Domain::Point->new_from_values($position->@*);
-
     }
 
     $last_position = $position;
@@ -99,12 +96,13 @@ method set_position($entity, $point)
 
         return
     }
-
+    # p $target, as => 'target';
+    # p $position, as => 'position';
     return if $position->equals_to($target);
     $position = $target;
     $self->is_dirty(true);
 
-    return $position
+    return true
 }
 
 method get_position($entity)

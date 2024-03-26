@@ -8,6 +8,7 @@ use builtin qw(true false);
 use Data::Printer;
 use Game::Entity;
 use Game::Domain::Task;
+use Game::Domain::Command;
 use Game::Trait::Planning;
 use Game::Trait::Mobile;
 use Game::Trait::Position;
@@ -18,14 +19,14 @@ subtest 'Game::Trait::Planning' => sub
     my $trait = Game::Trait::Planning->new();
 
     my $entity = Game::Entity->new(
-        traits => [
+        initial_traits => [
             Game::Trait::Mobile->new(),
             Game::Trait::Position->new(),
             $trait
         ]
     );
 
-    ok $entity->has_ability('go'), 'has ability go';
+    ok $entity->has_ability('go_to'), 'has ability go';
 
     my $position = $entity->do('get_position');
 
@@ -40,9 +41,9 @@ subtest 'Game::Trait::Planning' => sub
     is $entity->do('current_task'), undef, 'current_task is undef';
 
     my $task = Game::Domain::Task->new(
-        do => Game::Command->new(
+        do => Game::Domain::Command->new(
                 actor => $entity,
-                action => 'go',
+                action => 'move',
                 params => ['n']),
         while => sub($entity, $iteration)
         {
@@ -55,6 +56,8 @@ subtest 'Game::Trait::Planning' => sub
     $entity->update(1);
 
     my $pos_after_1 = $entity->do('get_position');
+
+    p $pos_after_1, as => 'pos_after_1';
 
     is $pos_after_1->y(), $position->y()+1, 'moved north';
 

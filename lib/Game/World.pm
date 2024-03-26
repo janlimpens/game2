@@ -16,6 +16,7 @@ field $width :reader :param=100;
 field $height :reader :param=100;
 field $quit=false;
 field %subscriptions;
+field $time :reader;
 
 method subscribe($event, $callback)
 {
@@ -79,6 +80,8 @@ method get_entities_in_range($point, $distance)
 
 method update($i)
 {
+    $time = $i;
+
     print color( join '', 'rgb', ( map { int(2 + rand(3)) } (0..2) ) );
 
     say "Iteration $i";
@@ -92,7 +95,6 @@ method update($i)
             if $changes;
     }
 
-    p %changes, as => 'changes';
 
     for my $id (keys %changes)
     {
@@ -102,10 +104,14 @@ method update($i)
         for my $change (keys $changes->%*)
         {
             my $subscribers = $subscriptions{$change};
-            say $_->($entity, $changes->{$change})
-                for $subscribers->@*;
+            for ($subscribers->@*)
+            {
+                say $_->($entity, $changes->{$change})
+            }
         }
     }
+
+    p %changes, as => 'changes';
 
     print color('reset');
     say '-' x 80;

@@ -12,13 +12,50 @@ use Carp;
 use Data::Printer;
 use Game::Domain::Body;
 
-field $body;
+field $body :reader;
+field %changes;
 
-method height() { return $body->height() }
+method height($h=undef)
+{
+    $body = Game::Domain::Body->new(
+        height => $h,
+        width => $body->width(),
+        diameter => $body->diameter())
+        if defined $h;
 
-method width() { return $body->width() }
+    $changes{height} = $h;
+    $changes{body} = $body;
 
-method diameter() { return $body->diameter() }
+    return $body->height()
+}
+
+method width($w=undef)
+{
+    $body = Game::Domain::Body->new(
+        height => $body->height(),
+        width => $w,
+        diameter => $body->diameter())
+        if defined $w;
+
+    $changes{width} = $w;
+    $changes{body} = $body;
+
+    return $body->width()
+}
+
+method diameter($d=undef)
+{
+    $body = Game::Domain::Body->new(
+        height => $body->height(),
+        width => $body->width(),
+        diameter => $d)
+        if defined $d;
+
+    $changes{diameter} = $d;
+    $changes{body} = $body;
+
+    return $body->diameter()
+}
 
 ADJUST :params ( :$height, :$width, :$diameter )
 {
@@ -66,7 +103,14 @@ method stringify()
 
 method update($entity, $iteration)
 {
-    return
+    my $result = { %changes };
+    %changes = ();
+    return $result
+}
+
+method equal_to($other)
+{
+    return $body->equal_to($other)
 }
 
 apply Game::Role::Trait;
