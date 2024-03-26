@@ -12,6 +12,7 @@ use Data::Printer;
 
 field $name :param;
 field $mutable :param=true;
+field $pronouns :param=[qw(they theirs them themself)];
 
 method description :common ($name='An entity with this trait')
 {
@@ -41,6 +42,9 @@ ADJUST
         },
         get_name => method($entity) {
             return $name
+        },
+        get_pronouns => method($entity) {
+            return $pronouns
         },
     );
 

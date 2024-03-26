@@ -88,7 +88,7 @@ method look_around($entity)
     {
         my ($p, $d, $e) = $_->@*;
         my $name = $e->do('get_name');
-        my $description = $e->do('get_description');
+        my $description = $e->do('get_random_fact');
         my $dir = $position->approximate_direction_of($p);
         say "In the $dir, there is $name. $description";
     }

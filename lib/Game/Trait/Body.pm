@@ -28,7 +28,6 @@ ADJUST :params ( :$height, :$width, :$diameter )
         diameter => $diameter);
 
     my %abilities = (
-        diameter => \&diameter,
         fits_inside => method ($entity, $other)
         {
             my $other_body = $other->do('get_body');
@@ -38,9 +37,10 @@ ADJUST :params ( :$height, :$width, :$diameter )
             return $body->fits_through($other)
         },
         get_body => method ($entity) { return $body },
-        height => \&height,
-        width => \&width,
-        volume => \&volume,
+        get_diameter => sub { return $body->diameter() },
+        get_height => sub { return $body->height() },
+        get_width => sub { return $body->width() },
+        get_volume => sub { return $body->volume() },
     );
 
     for my $ability (keys %abilities)

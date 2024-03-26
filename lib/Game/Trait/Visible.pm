@@ -44,6 +44,39 @@ ADJUST
             $self->is_dirty(true);
             return $visible
         },
+        get_random_fact => method($entity)
+        {
+            my $name = $entity->do('get_pronouns')
+                // $entity->do('get_name')
+                // $entity->id();
+
+            my %factoids = (
+                height => sub($entity) {
+                    my $height = $entity->do('get_height');
+                    return false unless $height;
+                    return "$name stands $height units tall.";
+                },
+                width => sub($entity) {
+                    my $width = $entity->do('get_width');
+                    return false unless $width;
+                    return "$name has a width of $width.";
+                },
+                diameter => sub($entity) {
+                    my $diameter = $entity->do('get_diameter');
+                    return false unless $diameter;
+                    return "$name has a diameter of $diameter.";
+                },
+                volume => sub($entity) {
+                    my $volume = $entity->do('get_volume');
+                    return false unless $volume;
+                    return "$name has a volume of $volume.";
+                },
+            );
+
+            my ($factoid) = keys %factoids;
+
+            return $factoids{$factoid}->($entity);
+        },
     );
 
     for my ($ability, $method) (%abilities)

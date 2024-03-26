@@ -41,4 +41,5 @@ method stringify()
         $height, $width, $diameter;
 }
 
+
 1;
