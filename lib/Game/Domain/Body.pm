@@ -32,7 +32,43 @@ method fits_inside($other)
 
 method fits_through($other)
 {
-    return $self->fits_inside($other);
+    # $other is negative space
+    return
+        $other->height() < 0
+        && $other->width() < 0
+        && $other->diameter() < 0
+        && $self->is_smaller_than(
+            Game::Domain::Body->new(
+                height => $other->height() * -1,
+                width => $other->width() * -1,
+                diameter => $other->diameter() * -1) );
+}
+
+method equal_to($other)
+{
+    return $height == $other->height()
+        && $width == $other->width()
+        && $diameter == $other->diameter();
+}
+
+method intersects($other)
+{
+    return $height >= $other->height()
+        || $width >= $other->width()
+        || $diameter >= $other->diameter();
+}
+
+method is_smaller_than($other)
+{
+    return $height < $other->height()
+        && $width < $other->width()
+        && $diameter < $other->diameter();
+}
+
+method is_larger_than($other)
+{
+    return !$self->equal_to($other)
+    && !$self->is_smaller_than($other)
 }
 
 method stringify()

@@ -15,6 +15,13 @@ field %entities;
 field $width :reader :param=100;
 field $height :reader :param=100;
 field $quit=false;
+field %subscriptions;
+field $time :reader;
+
+method subscribe($event, $callback)
+{
+    push $subscriptions{$event}->@*, $callback;
+}
 
 method should_quit() {
     return $quit
@@ -61,24 +68,50 @@ method get_entity_at($point)
 
 method get_entities_in_range($point, $distance)
 {
+    return unless $point;
+
     return
         grep {
             my $pos = $_->do('get_position');
-            $pos->distance_to($point) <= $distance
+            $pos ? $pos->distance_to($point) <= $distance : false
         }
         values %entities
 }
 
 method update($i)
 {
-    say "Iteration $i";
+    $time = $i;
 
     print color( join '', 'rgb', ( map { int(2 + rand(3)) } (0..2) ) );
 
+    say "Iteration $i";
+
+    my %changes;
+
     for my $entity (values %entities)
     {
-        $entity->update($i);
+        my $changes = $entity->update($i);
+        $changes{$entity->id()} = $changes
+            if $changes;
     }
+
+
+    for my $id (keys %changes)
+    {
+        my $entity = $entities{$id};
+        my $changes = $changes{$id};
+
+        for my $change (keys $changes->%*)
+        {
+            my $subscribers = $subscriptions{$change};
+            for ($subscribers->@*)
+            {
+                say $_->($entity, $changes->{$change})
+            }
+        }
+    }
+
+    p %changes, as => 'changes';
 
     print color('reset');
     say '-' x 80;

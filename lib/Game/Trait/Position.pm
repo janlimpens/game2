@@ -12,7 +12,9 @@ use Data::Printer;
 use Game::Domain::Point;
 use Game::World;
 
+field $last_position;
 field $position :param=Game::Domain::Point->origin();
+field $world = Game::World->get_instance();
 
 method description :common ($name='An entity with this trait')
 {
@@ -26,7 +28,15 @@ method stringify()
 
 method update($entity, $iteration)
 {
-    return
+    my %changes;
+
+    unless ($position->equals_to($last_position))
+    {
+        $changes{position} = $position;
+        $last_position = $position;
+    }
+
+    return \%changes
 }
 
 apply Game::Role::Trait;
@@ -51,6 +61,9 @@ ADJUST
     {
         $position = Game::Domain::Point->new_from_values($position->@*);
     }
+
+    $last_position = $position;
+
     croak "Didn't get the point"
         unless $position->isa('Game::Domain::Point');
 }
@@ -60,8 +73,6 @@ method set_position($entity, $point)
     my $z = defined $point->z()
         ? $point->z()
         : $position->z();
-
-    my $world = Game::World->get_instance();
 
     my $x = $point->x() > $world->width()
         ? $world->width()
@@ -85,12 +96,13 @@ method set_position($entity, $point)
 
         return
     }
-
+    # p $target, as => 'target';
+    # p $position, as => 'position';
     return if $position->equals_to($target);
     $position = $target;
     $self->is_dirty(true);
 
-    return $position
+    return true
 }
 
 method get_position($entity)

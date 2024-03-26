@@ -47,7 +47,7 @@ method update($entity, $iteration)
 {
     if (my $task = $self->current_task())
     {
-$DB::single=1;
+        # $DB::single=1;
         $task->update($entity, $iteration);
         shift @tasks
             if $task->done();

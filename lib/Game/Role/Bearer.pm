@@ -4,7 +4,10 @@ use Object::Pad ':experimental(inherit_field)';
 
 role Game::Role::Bearer;
 
-no warnings qw(experimental::builtin experimental::try);
+no warnings qw(
+    experimental::builtin
+    experimental::try
+    experimental::for_list);
 use builtin qw(blessed true false);
 use feature qw(try);
 use Carp qw(carp cluck longmess);
@@ -75,10 +78,20 @@ method find_traits_with_ability($ability)
 
 method update($i)
 {
-    $_->update($self, $i)
-        for values %traits;
+    my %result;
 
-    return
+    for my $trait (values %traits)
+    {
+        my $result = $trait->update($self, $i);
+
+        next unless ref $result;
+
+        for my($k, $v) ($result->%*) {
+            $result{$k} = $v;
+        }
+    }
+
+    return \%result
 }
 
 1;

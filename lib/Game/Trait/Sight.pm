@@ -12,7 +12,9 @@ use Game::World;
 
 field $max_distance :param=10;
 field $decrement :param=1;
-
+field $world = Game::World->get_instance();
+field $initialized = false;
+field %sight;
 
 method description :common ($name='An entity with this trait')
 {
@@ -24,9 +26,53 @@ method stringify()
     return sprintf "Sight";
 }
 
+method init($entity)
+{
+    $world->subscribe(direction => sub($other_entity, $direction)
+    {
+        return if $other_entity->id() eq $entity->id();
+        return unless $self->can_see($entity, $other_entity);
+        $sight{sees}{$other_entity->id()}{move} = $direction;
+
+        return $entity->id() . " sees " . $other_entity->id() . " moving $direction.";
+    });
+
+    $world->subscribe(position => sub($other_entity, $position)
+    {
+        return if $other_entity->id() eq $entity->id();
+        return unless $self->can_see($entity, $other_entity);
+        $sight{sees}{$other_entity->id()}{position} = $position;
+        $position = $position->stringify() if ref $position;
+
+        return $entity->id() . " sees " . $other_entity->id() . " arrive at position $position.";
+    });
+
+    my $body_change = sub($other, $dimension, $dim_name)
+    {
+        return if $other->id() eq $entity->id();
+        return unless $self->can_see($entity, $other);
+        $sight{sees}{$other->id()}{change}{$dim_name} = $dimension;
+
+        return sprintf '%s sees %s change %s to %s.',
+            $entity->id(), $other->id(), $dim_name, $dimension;
+    };
+
+    $world->subscribe($_ => sub($other, $dim) { $body_change->($other, $dim, $_) })
+        for qw(height weight diameter);
+}
+
 method update($entity, $iteration)
 {
-    return
+    unless ($initialized)
+    {
+        $self->init($entity);
+        $initialized = true;
+    }
+
+    my $sight = { %sight };
+    %sight = ();
+
+    return $sight
 }
 
 apply Game::Role::Trait;
@@ -57,8 +103,6 @@ method look_around($entity)
     }
 
     say "$name takes some time to look around.";
-
-    my $world = Game::World->get_instance();
 
     my @candidates =
         grep { $_->id() ne $entity->id() && $_->do('is_visible')}
@@ -107,7 +151,7 @@ method can_see($entity, $target)
     return unless
         my $target_position = $target->do('get_position');
 
-    my $distance = $target_position->distance($own_position);
+    my $distance = $target_position->distance_to($own_position);
 
     return $distance <= $max_distance
         ? $target
