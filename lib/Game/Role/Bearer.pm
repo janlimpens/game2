@@ -75,10 +75,20 @@ method find_traits_with_ability($ability)
 
 method update($i)
 {
-    $_->update($self, $i)
-        for values %traits;
+    my %result;
 
-    return
+    for my $trait (values %traits)
+    {
+        my $result = $trait->update($self, $i);
+
+        next unless ref $result;
+
+        for my($k, $v) ($result->%*) {
+            $result{$k} = $v;
+        }
+    }
+
+    return \%result
 }
 
 1;

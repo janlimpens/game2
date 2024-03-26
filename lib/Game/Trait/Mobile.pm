@@ -62,6 +62,12 @@ method stringify()
 
 method update($entity, $iteration)
 {
+    my %changes;
+
+    $changes{direction} = $last_direction
+        if $self->is_dirty();
+
+    return \%changes
 }
 
 method move($entity, @params)
