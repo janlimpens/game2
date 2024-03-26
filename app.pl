@@ -18,6 +18,7 @@ use Game::Trait::Sight;
 use Game::Trait::Visible;
 use Game::World;
 use Game::Domain::Command;
+## no critic (ProhibitSubroutinePrototypes)
 
 sub build_human(%args)
 {

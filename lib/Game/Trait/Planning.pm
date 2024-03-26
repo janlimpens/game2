@@ -10,10 +10,13 @@ use builtin qw(true false);
 use feature qw(say);
 use Data::Printer;
 use Game::Domain::Result;
-use Game::Command;
+
+use constant {
+    Result => 'Game::Domain::Result',
+};
 
 field @tasks;
-# Game::Trait implementation
+# Game::Role::Trait implementation
 
 method description :common ($name='An entity with this trait')
 {
@@ -22,15 +25,15 @@ method description :common ($name='An entity with this trait')
 
 method queue_task($task)
 {
-    return Game::Domain::Result->with_error('Task required')
+    return Result->with_error('Task required')
         unless $task;
 
-    return Game::Domain::Result->with_error('Game::Domain::Task required')
+    return Result->with_error('Game::Domain::Task required')
         unless $task->isa('Game::Domain::Task');
 
     push @tasks, $task;
 
-    return Game::Domain::Result->with_some($task)
+    return Result->with_some($task)
 }
 
 method current_task()
@@ -52,7 +55,7 @@ $DB::single=1;
     return
 }
 
-apply Game::Trait;
+apply Game::Role::Trait;
 
 ADJUST
 {

@@ -37,8 +37,12 @@ method do($ability, @params)
     # $self->log(info => "Entity $id does not have ability $ability.");
 }
 
+apply Game::Role::Bearer;
+
 method stringify()
 {
+    # p $self->trait_types(), as => 'trait types';
+
     my @traits =
         map { (blessed $_)->description() }
         $self->trait_types();
@@ -53,5 +57,6 @@ method log($level, $message)
 {
     # get_logger('Game::Entity')->$level($message);
 }
+
 
 1;

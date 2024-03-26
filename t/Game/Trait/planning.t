@@ -11,6 +11,8 @@ use Game::Domain::Task;
 use Game::Trait::Planning;
 use Game::Trait::Mobile;
 use Game::Trait::Position;
+use Game::Domain::Command;
+
 no warnings qw(experimental::builtin);
 
 subtest 'Game::Trait::Planning' => sub
@@ -18,12 +20,14 @@ subtest 'Game::Trait::Planning' => sub
     my $trait = Game::Trait::Planning->new();
 
     my $entity = Game::Entity->new(
-        traits => [
+        initial_traits => [
             Game::Trait::Mobile->new(),
             Game::Trait::Position->new(),
             $trait
         ]
     );
+
+    ok $entity, 'entity is defined';
 
     ok $entity->has_ability('go'), 'has ability go';
 
@@ -40,7 +44,7 @@ subtest 'Game::Trait::Planning' => sub
     is $entity->do('current_task'), undef, 'current_task is undef';
 
     my $task = Game::Domain::Task->new(
-        do => Game::Command->new(
+        do => Game::Domain::Command->new(
                 actor => $entity,
                 action => 'go',
                 params => ['n']),

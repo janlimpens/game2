@@ -27,7 +27,7 @@ ADJUST
 
 method trait_types()
 {
-    return keys %traits
+    return (sort keys %traits)
 }
 
 method has_trait($trait)
