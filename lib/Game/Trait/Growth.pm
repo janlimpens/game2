@@ -84,7 +84,7 @@ sub default_curve($time, $body, $min, $max, $value, $changes)
     my $growth = $v2 - $v1;
     $changes->{volume} = $growth;
 
-    p $changes, as => 'growth';
+    # p $changes, as => 'growth';
 
     return $growth
 }

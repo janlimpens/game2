@@ -10,6 +10,7 @@ use feature qw(say);
 use Carp;
 use Data::Printer;
 use Game::Domain::Command;
+use Game::World;
 
 field $last_command;
 field $world = Game::World->get_instance();
@@ -29,7 +30,7 @@ method update($entity, $iteration)
     {
         $world->subscribe(position => sub($e, $position)
         {
-            $current_position = $position 
+            $current_position = $position
                 if $e->id() eq $entity->id();
         });
 
