@@ -61,10 +61,10 @@ ADJUST
                     return false unless $width;
                     return "$name has a width of $width.";
                 },
-                diameter => sub($entity) {
-                    my $diameter = $entity->do('get_diameter');
-                    return false unless $diameter;
-                    return "$name has a diameter of $diameter.";
+                depth => sub($entity) {
+                    my $depth = $entity->do('get_depth');
+                    return false unless $depth;
+                    return "$name has a depth of $depth.";
                 },
                 volume => sub($entity) {
                     my $volume = $entity->do('get_volume');

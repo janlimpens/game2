@@ -18,8 +18,8 @@ use constant {
 
 field %changes;
 field $body_trait :param;
-field $min :param=Body->new(height => 0, width => 0, diameter => 0);
-field $max :param=Body->new(height => 3, width => 3, diameter => 3);
+field $min :param=Body->new(height => 0, width => 0, depth => 0);
+field $max :param=Body->new(height => 3, width => 3, depth => 3);
 field $increment :param=1;
 field $curve :param=sub { default_curve(@_) };
 
@@ -50,6 +50,7 @@ method update($entity, $iteration)
 
 apply Game::Role::Trait;
 
+## no critic prototypes
 sub default_curve($time, $body, $min, $max, $value, $changes)
 {
     return
@@ -73,16 +74,17 @@ sub default_curve($time, $body, $min, $max, $value, $changes)
         $changes->{width} = $body->height();
     }
 
-    if ($body->diameter() < $max->diameter())
+    if ($body->depth() < $max->depth())
     {
-        $body->diameter($body->diameter() + $augment);
-        $changes->{diameter} = $body->height();
+        $body->depth($body->depth() + $augment);
+        $changes->{depth} = $body->height();
     }
 
     my $v2 = $body->volume();
     my $growth = $v2 - $v1;
-
     $changes->{volume} = $growth;
+
+    p $changes, as => 'growth';
 
     return $growth
 }

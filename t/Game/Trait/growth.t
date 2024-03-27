@@ -14,7 +14,7 @@ subtest 'Game::Trait::Growth' => sub
     my $body = Game::Trait::Body->new(
         height => 1,
         width => 2,
-        diameter => 3
+        depth => 3
     );
 
     my $growth = Game::Trait::Growth->new(

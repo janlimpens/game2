@@ -57,7 +57,8 @@ ADJUST
     if (ref $position eq 'HASH')
     {
         $position = Game::Domain::Point->new($position->%*);
-    } elsif (ref $position eq 'ARRAY')
+    }
+    elsif (ref $position eq 'ARRAY')
     {
         $position = Game::Domain::Point->new_from_values($position->@*);
     }

@@ -20,7 +20,7 @@ method height($h=undef)
     $body = Game::Domain::Body->new(
         height => $h,
         width => $body->width(),
-        diameter => $body->diameter())
+        depth => $body->depth())
         if defined $h;
 
     $changes{height} = $h;
@@ -34,7 +34,7 @@ method width($w=undef)
     $body = Game::Domain::Body->new(
         height => $body->height(),
         width => $w,
-        diameter => $body->diameter())
+        depth => $body->depth())
         if defined $w;
 
     $changes{width} = $w;
@@ -43,26 +43,26 @@ method width($w=undef)
     return $body->width()
 }
 
-method diameter($d=undef)
+method depth($d=undef)
 {
     $body = Game::Domain::Body->new(
         height => $body->height(),
         width => $body->width(),
-        diameter => $d)
+        depth => $d)
         if defined $d;
 
-    $changes{diameter} = $d;
+    $changes{depth} = $d;
     $changes{body} = $body;
 
-    return $body->diameter()
+    return $body->depth()
 }
 
-ADJUST :params ( :$height, :$width, :$diameter )
+ADJUST :params ( :$height, :$width, :$depth )
 {
     $body = Game::Domain::Body->new(
         height => $height,
         width => $width,
-        diameter => $diameter);
+        depth => $depth);
 
     my %abilities = (
         fits_inside => method ($entity, $other)
@@ -74,7 +74,7 @@ ADJUST :params ( :$height, :$width, :$diameter )
             return $body->fits_through($other)
         },
         get_body => method ($entity) { return $body },
-        get_diameter => sub { return $body->diameter() },
+        get_depth => sub { return $body->depth() },
         get_height => sub { return $body->height() },
         get_width => sub { return $body->width() },
         get_volume => sub { return $body->volume() },

@@ -30,7 +30,7 @@ subtest 'Game::Trait::Planning' => sub
 
     ok $entity, 'entity is defined';
 
-    ok $entity->has_ability('go'), 'has ability go';
+    ok $entity->has_ability('go_to'), 'has ability go';
 
     my $position = $entity->do('get_position');
 

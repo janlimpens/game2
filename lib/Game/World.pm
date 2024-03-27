@@ -92,7 +92,7 @@ method update($i)
     {
         my $changes = $entity->update($i);
         $changes{$entity->id()} = $changes
-            if $changes;
+            if $changes && $changes->%*;
     }
 
 

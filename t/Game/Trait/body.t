@@ -14,14 +14,14 @@ subtest 'Game::Trait::Body' => sub
     my $body = Game::Trait::Body->new(
         height => 1,
         width => 2,
-        diameter => 3
+        depth => 3
     );
 
     is $body->height(), 1, 'height()';
 
     is $body->width(), 2, 'width()';
 
-    is $body->diameter(), 3, 'diameter()';
+    is $body->depth(), 3, 'depth()';
 
     is $body->volume(), 6, 'volume()';
 

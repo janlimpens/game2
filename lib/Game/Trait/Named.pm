@@ -26,7 +26,7 @@ method stringify()
 
 method update($entity, $iteration)
 {
-    return
+    return {}
 }
 
 apply Game::Role::Trait;

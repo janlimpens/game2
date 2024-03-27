@@ -17,18 +17,18 @@ subtest 'Game::Entity initialization' => sub
     my $trait = Game::Trait::Body->new(
         height => 2,
         width => 1,
-        diameter => 1);
+        depth => 1);
 
     $entity->add_trait($trait);
 
     is [$entity->abilities()], [sort qw(
-        diameter
+        get_depth
         fits_inside
         fits_through
         get_body
-        height
-        volume
-        width )], 'get_abilities()';
+        get_height
+        get_volume
+        get_width )], 'get_abilities()';
 
     $entity->remove_trait('Game::Trait::Body');
 

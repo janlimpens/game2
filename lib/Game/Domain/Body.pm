@@ -13,11 +13,11 @@ field $height :reader :param=1;
 field $width :reader :param=1;
 
 # negative value indicates opening
-field $diameter :reader :param=1;
+field $depth :reader :param=1;
 
 method volume()
 {
-    return $height * $width * $diameter
+    return $height * $width * $depth
 }
 
 method fits_inside($other)
@@ -27,7 +27,7 @@ method fits_inside($other)
     return false unless $other;
     return $height >= $other->height()
         && $width >= $other->width()
-        && $diameter >= $other->diameter();
+        && $depth >= $other->depth();
 }
 
 method fits_through($other)
@@ -36,33 +36,33 @@ method fits_through($other)
     return
         $other->height() < 0
         && $other->width() < 0
-        && $other->diameter() < 0
+        && $other->depth() < 0
         && $self->is_smaller_than(
             Game::Domain::Body->new(
                 height => $other->height() * -1,
                 width => $other->width() * -1,
-                diameter => $other->diameter() * -1) );
+                depth => $other->depth() * -1) );
 }
 
 method equal_to($other)
 {
     return $height == $other->height()
         && $width == $other->width()
-        && $diameter == $other->diameter();
+        && $depth == $other->depth();
 }
 
 method intersects($other)
 {
     return $height >= $other->height()
         || $width >= $other->width()
-        || $diameter >= $other->diameter();
+        || $depth >= $other->depth();
 }
 
 method is_smaller_than($other)
 {
     return $height < $other->height()
         && $width < $other->width()
-        && $diameter < $other->diameter();
+        && $depth < $other->depth();
 }
 
 method is_larger_than($other)
@@ -74,7 +74,7 @@ method is_larger_than($other)
 method stringify()
 {
     return sprintf "h: %d;w: %d; d: %d",
-        $height, $width, $diameter;
+        $height, $width, $depth;
 }
 
 

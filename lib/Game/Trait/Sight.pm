@@ -51,14 +51,19 @@ method init($entity)
     {
         return if $other->id() eq $entity->id();
         return unless $self->can_see($entity, $other);
+
         $sight{sees}{$other->id()}{change}{$dim_name} = $dimension;
 
         return sprintf '%s sees %s change %s to %s.',
             $entity->id(), $other->id(), $dim_name, $dimension;
     };
 
-    $world->subscribe($_ => sub($other, $dim) { $body_change->($other, $dim, $_) })
-        for qw(height weight diameter);
+    $world->subscribe($_ => sub($other, $dim)
+    {
+        my $dn = $_;
+        return $body_change->($other, $dim, $dn)
+    }
+    ) for qw(height weight depth);
 }
 
 method update($entity, $iteration)

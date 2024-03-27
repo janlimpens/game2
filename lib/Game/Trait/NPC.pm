@@ -11,6 +11,7 @@ use Data::Printer;
 use Game::Domain::Point;
 
 field $last_direction;
+field %changes;
 
 method description :common ($name='An entity with this trait')
 {
@@ -33,7 +34,9 @@ method update($entity, $iteration)
     #random
     my ($action) = keys %actions;
 
-    return $actions{$action}->($self, $entity);
+    $actions{$action}->($self, $entity);
+
+    return \%changes
 }
 
 method move($entity, $direction)
@@ -56,6 +59,8 @@ method stand_around($entity)
     my $name = $self->get_name($entity) // $entity->id();
     my $pos = $self->get_position($entity)->stringify();
     say "$name just slacks off at position $pos.";
+
+    $changes{does}{something} = false;
 
     return
 }
@@ -109,8 +114,7 @@ method walk_aimlessly($entity)
 
     my $pos = $self->get_position($entity);
 
-    say sprintf '%s walks aimlessly %s and arrives at %s.',
-        $name, $direction, $pos->stringify();
+    $changes{wanders}{$direction} = $pos->stringify();
 
     return
 }

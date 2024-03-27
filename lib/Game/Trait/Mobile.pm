@@ -5,23 +5,33 @@ use Object::Pad;
 
 class Game::Trait::Mobile;
 
-no warnings qw(experimental::builtin);
+no warnings qw(
+    experimental::builtin
+    experimental::for_list);
 use builtin qw(true false);
 use feature qw(say);
 use Data::Printer;
 use Game::Domain::Point;
 
 field $last_direction;
+field %changes;
 
 ADJUST
 {
     my %abilities = (
-        move => \&move,
-        go_to => \&go_to,
+        move => method ($entity, @params) {
+            my ($dir) = @params;
+            return $self->move($entity, $dir)
+        },
+        go_to => method ($entity, @params) {
+            my ($target) = @params;
+            return $self->go_to($entity, $target)
+        },
     );
-    for my $ability (keys %abilities)
+
+    for my ($ability, $code) (%abilities)
     {
-        $self->add_ability($ability, $abilities{$ability});
+        $self->add_ability($ability, $code);
     }
 };
 
@@ -59,8 +69,6 @@ method stringify()
 
 method update($entity, $iteration)
 {
-    my %changes;
-
     $changes{direction} = $last_direction
         if $self->is_dirty();
 
@@ -123,8 +131,8 @@ method move($entity, @params)
 
     $self->is_dirty(true);
 
+    $changes{move} = $direction;
     # say "$called moved $direction.";
-
     return true
 }
 

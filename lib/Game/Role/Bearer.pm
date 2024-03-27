@@ -82,9 +82,7 @@ method update($i)
 
     for my $trait (values %traits)
     {
-        my $result = $trait->update($self, $i);
-
-        next unless ref $result;
+        my $result = $trait->update($self, $i) // next;
 
         for my($k, $v) ($result->%*) {
             $result{$k} = $v;
