@@ -34,20 +34,18 @@ method do($ability, @params)
 {
     if (my ($trait) = $self->find_traits_with_ability($ability))
     {
+        # always a Result
         return $trait->do($self, $ability, @params);
     }
-    return
-    # $self->log(info => "Entity $id does not have ability $ability.");
+
+    return Game::Domain::Result->with_error("Entity $id does not have ability $ability.");
 }
 
 method get($property)
 {
-    my $p = "get_$property"
-        unless $property =~ /^get_/;
-
     my @results =
-        map { $_->get($p) }
-        $self->find_traits_with_property($p);
+        map { $_->get($property) }
+        $self->find_traits_with_property($property);
 
     return Game::Domain::Result->new(
         @results

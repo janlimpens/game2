@@ -6,7 +6,7 @@ class Game::Domain::Result;
 
 no warnings qw(experimental::builtin);
 use builtin qw(true false blessed);
-use Carp;
+use Carp qw(longmess croak);
 
 field $error :reader :param=undef;
 field $some :param=undef;
@@ -19,6 +19,11 @@ ADJUST
 
     die 'Either some or error required required'
         if !defined $error && !defined $some;
+
+    $self = $some
+        if blessed $some
+        && $some->isa('Game::Domain::Result')
+        && $some ne $self;
 }
 
 method some()
@@ -40,15 +45,27 @@ method with_some :common ($some)
 
 method unwrap()
 {
-    croak 'No value to unwrap'
-        unless defined $some;
+    croak $error
+        if $self->is_error();
 
     return $self->some()
 }
 
-method was_successful()
+method unwrap_or($default)
+{
+    return $self->is_error()
+        ? $default
+        : $self->some()
+}
+
+method is_some()
 {
     return defined $some
+}
+
+method is_error()
+{
+    return defined $error
 }
 
 1;

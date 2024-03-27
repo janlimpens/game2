@@ -60,7 +60,7 @@ method get_entity_at($point)
 {
     return
         first {
-            my $pos = $_->do('get_position');
+            my $pos = $_->get('position');
             $pos ? $pos->equals_to($point) : false
         }
         values %entities
@@ -72,7 +72,7 @@ method get_entities_in_range($point, $distance)
 
     return
         grep {
-            my $pos = $_->do('get_position');
+            my $pos = $_->get('position');
             $pos ? $pos->distance_to($point) <= $distance : false
         }
         values %entities

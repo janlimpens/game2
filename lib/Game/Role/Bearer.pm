@@ -60,9 +60,26 @@ method abilities()
     return @abs;
 }
 
-method has_ability($ability)
+method properties()
 {
-    return
+    my @props =
+        sort
+        map { $_->properties() }
+        values %traits;
+
+    return @props;
+}
+
+method has($property)
+{
+    return !!
+        grep { $_ eq $property }
+        $self->properties()
+}
+
+method can_do($ability)
+{
+    return !!
         grep { $_ eq $ability }
         $self->abilities()
 }
@@ -70,16 +87,16 @@ method has_ability($ability)
 method find_traits_with_ability($ability)
 {
     my @found_traits =
-        grep { $_->has_ability($ability) }
+        grep { $_->can_do($ability) }
         values %traits;
-
+p %traits;
     return @found_traits;
 }
 
 method find_traits_with_property($property)
 {
     my @found_traits =
-        grep { $_->has_property($property) }
+        grep { $_->has($property) }
         values %traits;
 
     return @found_traits;

@@ -12,8 +12,9 @@ use Carp;
 use Data::Printer;
 use Game::Domain::Body;
 
-field $body :reader;
+field $body;
 field %changes;
+field %abilities;
 
 method height($h=undef)
 {
@@ -84,12 +85,42 @@ method equal_to($other)
     return $body->equal_to($other)
 }
 
+method intersects($other)
+{
+    return $body->intersects($other)
+}
+
 method properties()
 {
-    return qw(body height width diameter)
+    return qw(body height width diameter volume)
+}
+
+method abilities()
+{
+    return qw(fits_inside fits_through)
 }
 
 apply Game::Role::Trait;
+
+method fits_inside($entity, $other)
+{
+    my $other_body = $other->get('body')->unwrap();
+
+    return $other_body->is_smaller_than($body)
+}
+
+method fits_through($entity, $other)
+{
+    return $body->fits_inside($other)
+}
+
+method body()
+{
+    return Game::Domain::Body->new(
+        height => $body->height(),
+        width => $body->width(),
+        diameter => $body->diameter())
+}
 
 ADJUST :params ( :$height, :$width, :$diameter )
 {
@@ -97,28 +128,6 @@ ADJUST :params ( :$height, :$width, :$diameter )
         height => $height,
         width => $width,
         diameter => $diameter);
-
-    my %abilities = (
-        diameter => \&diameter,
-        fits_inside => method ($entity, $other)
-        {
-            my $other_body = $other->do('get_body');
-            return $body->fits_inside($other_body)
-        },
-        fits_through => method ($entity, $other) {
-            return $body->fits_through($other)
-        },
-        get_body => method ($entity) { return $body },
-        height => \&height,
-        width => \&width,
-        volume => \&volume,
-    );
-
-    for my $ability (keys %abilities)
-    {
-        $self->add_ability($ability, $abilities{$ability});
-    }
-
 };
 
 1;

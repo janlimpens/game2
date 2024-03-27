@@ -22,13 +22,13 @@ subtest 'Game::Entity initialization' => sub
     $entity->add_trait($trait);
 
     is [$entity->abilities()], [sort qw(
-        diameter
         fits_inside
         fits_through
-        get_body
-        height
-        volume
-        width )], 'get_abilities()';
+    )], 'get_abilities()';
+
+    is [$entity->properties()], [sort qw(
+        body height width diameter volume
+    )], 'get_properties()';
 
     $entity->remove_trait('Game::Trait::Body');
 

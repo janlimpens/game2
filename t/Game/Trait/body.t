@@ -24,13 +24,14 @@ subtest 'Game::Trait::Body' => sub
     is $body->volume(), 6, 'volume()';
 
     my $e = Game::Entity->new(
-        traits => [ $body ]);
+        initial_traits => [ $body ]);
 
-    is $e->do('fits_inside', $e), undef, 'fits_inside()';
+    is $e->do('fits_inside', $e)->unwrap(), undef, 'fits_inside()';
 
     is $body->stringify(), 'Body (h: 1;w: 2; d: 3)', 'stringify()';
 
     ok $body->has('height'), 'has(height)';
+
     is $body->get('diameter')->unwrap(), 3, 'get_property(diameter)';
 };
 

@@ -42,24 +42,18 @@ method update($entity, $iteration)
 
 method properties()
 {
-    return qw(position)
+    return qw(position vicinity)
+}
+
+method abilities()
+{
+    return qw(set_position)
 }
 
 apply Game::Role::Trait;
 
 ADJUST
 {
-    my %abilities = (
-        set_position => \&set_position,
-        get_position => \&get_position,
-        get_vicinity => \&get_vicinity,
-    );
-
-    for my $ability (keys %abilities)
-    {
-        $self->add_ability($ability, $abilities{$ability});
-    }
-
     if (ref $position eq 'HASH')
     {
         $position = Game::Domain::Point->new($position->%*);
@@ -68,14 +62,17 @@ ADJUST
         $position = Game::Domain::Point->new_from_values($position->@*);
     }
 
-    $last_position = $position;
-
     croak "Didn't get the point"
         unless $position->isa('Game::Domain::Point');
+
+    $last_position = $position;
 }
 
 method set_position($entity, $point)
 {
+    croak "Didn't get the point"
+        unless defined $point || $point->isa('Game::Domain::Point');
+
     my $z = defined $point->z()
         ? $point->z()
         : $position->z();
@@ -92,7 +89,7 @@ method set_position($entity, $point)
 
     if (my $occupant = $world->get_entity_at($target))
     {
-        my $occupant_name = $occupant->do('get_name') // $occupant->id();
+        my $occupant_name = $occupant->get('name') // $occupant->id();
 
         if ($occupant->id() eq $entity->id()) {
             say "$occupant_name is already at position " . $target->stringify() . ".";
@@ -111,14 +108,14 @@ method set_position($entity, $point)
     return true
 }
 
-method get_position($entity)
+method position()
 {
     return $position
 }
 
 method get_vicinity($entity)
 {
-    if (my $position = $entity->do('get_position'))
+    if (my $position = $entity->get('position'))
     {
         my %offsets = (
             s  => [0,-1],

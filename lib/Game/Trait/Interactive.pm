@@ -20,20 +20,20 @@ method description :common ($name='An entity with this trait')
 
 method get_position($entity)
 {
-    return $entity->do('get_position');
+    return $entity->get('position');
 }
 
 method move($entity, $direction)
 {
-    my $name = $entity->do('get_name') // $entity->id();
+    my $name = $entity->get('name') // $entity->id();
     my $m = $entity->do('move', $direction);
-    my $position = $entity->do('get_position')->stringify();
+    my $position = $entity->get('position')->stringify();
     say "$name moves $direction and arrives at $position";
 }
 
 method update($entity, $iteration)
 {
-    my $entity_name = $entity->do('get_name') // $entity->id();
+    my $entity_name = $entity->get('name') // $entity->id();
 
     say "Input command for $entity_name and hit enter:";
 
@@ -80,7 +80,7 @@ method update($entity, $iteration)
     # p $cmd;
 
     return say "$entity_name does not know how to do $action"
-        unless $entity->has_ability($action);
+        unless $entity->can_do($action);
 
     if (my $own_method = $self->can($action))
     {
@@ -98,6 +98,11 @@ method stringify()
 method properties()
 {
     return ()
+}
+
+method abilities()
+{
+    return ();
 }
 
 apply Game::Role::Trait;

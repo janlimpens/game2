@@ -37,6 +37,8 @@ subtest 'Game::Trait::Mobile' => sub
         my @params = ($case->{params}//[])->@*;
         my $expected = $case->{expected};
         my $got = $entity->do($ability, @params);
+        # p $got;
+        $got = $got->unwrap();
         ok defined $got, "do($ability)->(@params) returns value";
         is $got, $expected, "do($ability)->($params[0])";
     };

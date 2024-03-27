@@ -22,6 +22,7 @@ field $min :param=Body->new(height => 0, width => 0, diameter => 0);
 field $max :param=Body->new(height => 3, width => 3, diameter => 3);
 field $increment :param=1;
 field $curve :param=sub { default_curve(@_) };
+field $stopped_growing = false;
 
 method description :common ($name='An entity with this trait')
 {
@@ -33,15 +34,26 @@ method stringify()
     return sprintf 'Body (%s)', $body_trait->body()->stringify()
 }
 
-method update($entity, $iteration)
+method grow($entity, $iteration)
 {
-    # my $body = $body_trait->body();
+    return if $stopped_growing;
+    my $body = $body_trait->body();
 
-    $min->is_smaller_than($max)
+    my $new_size = $min->is_smaller_than($max)
         ? $curve->($iteration, $body_trait, $min, $max, $increment, \%changes)
         : $curve->($iteration, $body_trait, $max, $min, $increment, \%changes);
 
-    # p %changes;
+    $stopped_growing = true
+        if $new_size >= $max->volume();
+
+    return $new_size
+}
+
+method update($entity, $iteration)
+{
+    return unless
+        $self->grow($entity, $iteration);
+
     my $changes = { %changes };
     %changes = ();
 
@@ -49,6 +61,11 @@ method update($entity, $iteration)
 }
 
 method properties()
+{
+    return ()
+}
+
+method abilities()
 {
     return ()
 }

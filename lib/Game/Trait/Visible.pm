@@ -30,31 +30,27 @@ method update($entity, $iteration)
 
 method properties()
 {
-    return qw(appearance visible)
+    return qw(appearance is_visible)
+}
+
+method abilities()
+{
+    return qw(toggle_visible)
 }
 
 apply Game::Role::Trait;
 
-ADJUST
+method is_visible ($entity)
 {
-    my %abilities = (
-        get_description => method($entity) {
-            return $appearance
-        },
-        is_visible => method($entity) {
-            return $visible
-        },
-        toggle_visible => method($entity) {
-            $visible = !$visible;
-            $self->is_dirty(true);
-            return $visible
-        },
-    );
-
-    for my ($ability, $method) (%abilities)
-    {
-        $self->add_ability($ability, $method);
-    };
+    return $visible
 }
+
+method toggle_visible ($entity)
+{
+    $visible = !$visible;
+    $self->is_dirty(true);
+    return $visible
+}
+
 
 1;
