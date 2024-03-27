@@ -57,7 +57,7 @@ subtest 'Game::Trait::Planning' => sub
 
     my $pos_after_1 = $entity->do('get_position');
 
-    p $pos_after_1, as => 'pos_after_1';
+    # p $pos_after_1, as => 'pos_after_1';
 
     is $pos_after_1->y(), $position->y()+1, 'moved north';
 

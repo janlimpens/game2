@@ -165,7 +165,7 @@ method _move_towards_entity($entity, $target)
 method go_to($entity, $target)
 {
     return $self->_move_towards_point($entity, $target)
-        if $target->isa('Game::Domain::Position');
+        if $target->isa('Game::Domain::Point');
 
     return $self->_move_towards_entity($entity, $target)
         if $target->isa('Game::Entity');
