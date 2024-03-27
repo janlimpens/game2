@@ -75,6 +75,11 @@ method update($entity, $iteration)
     return $sight
 }
 
+method properties()
+{
+    return qw(max_distance decrement)
+}
+
 apply Game::Role::Trait;
 
 ADJUST

@@ -2,12 +2,15 @@ use v5.38;
 use local::lib;
 use Object::Pad;
 use lib './lib';
+
 class Game::Entity;
 apply Game::Role::Bearer;
+
 no warnings qw(experimental::builtin);
 use builtin qw(blessed true false);
 use Carp;
 use Data::Printer;
+use Game::Domain::Result;
 # use Log::Log4perl qw(get_logger);
 
 field $id :reader :param=undef;
@@ -35,6 +38,21 @@ method do($ability, @params)
     }
     return
     # $self->log(info => "Entity $id does not have ability $ability.");
+}
+
+method get($property)
+{
+    my $p = "get_$property"
+        unless $property =~ /^get_/;
+
+    my @results =
+        map { $_->get($p) }
+        $self->find_traits_with_property($p);
+
+    return Game::Domain::Result->new(
+        @results
+            ? ( some => @results == 1 ? $results[0] : \@results )
+            : ( error => "Property $property not found in entity {$id}." ))
 }
 
 method stringify()

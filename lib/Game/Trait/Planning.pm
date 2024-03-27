@@ -51,6 +51,11 @@ method update($entity, $iteration)
     return
 }
 
+method properties()
+{
+    return ()
+}
+
 apply Game::Role::Trait;
 
 ADJUST

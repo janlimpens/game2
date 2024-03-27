@@ -28,6 +28,11 @@ method update($entity, $iteration)
     return
 }
 
+method properties()
+{
+    return qw(name mutable)
+}
+
 apply Game::Role::Trait;
 
 ADJUST

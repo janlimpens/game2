@@ -115,6 +115,11 @@ method walk_aimlessly($entity)
     return
 }
 
+method properties()
+{
+    return ()
+}
+
 apply Game::Role::Trait;
 
 1;

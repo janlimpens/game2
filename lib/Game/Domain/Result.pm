@@ -9,7 +9,7 @@ use builtin qw(true false blessed);
 use Carp;
 
 field $error :reader :param=undef;
-field $some :reader :param=undef;
+field $some :param=undef;
 
 ADJUST
 {
@@ -19,6 +19,13 @@ ADJUST
 
     die 'Either some or error required required'
         if !defined $error && !defined $some;
+}
+
+method some()
+{
+    return wantarray()
+        ? ref $some eq 'ARRAY' ? $some->@* : ($some)
+        : $some
 }
 
 method with_error :common ($error)
@@ -36,9 +43,7 @@ method unwrap()
     croak 'No value to unwrap'
         unless defined $some;
 
-    return ref $some eq 'CODE'
-        ? $some->()
-        : $some
+    return $self->some()
 }
 
 method was_successful()

@@ -10,7 +10,7 @@ use builtin qw(true false);
 use feature qw(say);
 use Data::Printer;
 
-field $my_description :param(description)='';
+field $appearance :param(description)='';
 field $visible :param=1;
 
 method description :common ($name='An entity with this trait')
@@ -28,13 +28,18 @@ method update($entity, $iteration)
     return
 }
 
+method properties()
+{
+    return qw(appearance visible)
+}
+
 apply Game::Role::Trait;
 
 ADJUST
 {
     my %abilities = (
         get_description => method($entity) {
-            return $my_description
+            return $appearance
         },
         is_visible => method($entity) {
             return $visible

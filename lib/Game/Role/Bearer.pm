@@ -76,6 +76,15 @@ method find_traits_with_ability($ability)
     return @found_traits;
 }
 
+method find_traits_with_property($property)
+{
+    my @found_traits =
+        grep { $_->has_property($property) }
+        values %traits;
+
+    return @found_traits;
+}
+
 method update($i)
 {
     my %result;

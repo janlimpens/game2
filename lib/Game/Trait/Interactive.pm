@@ -95,6 +95,11 @@ method stringify()
     return sprintf "Interactive";
 }
 
+method properties()
+{
+    return ()
+}
+
 apply Game::Role::Trait;
 
 # ADJUST {};

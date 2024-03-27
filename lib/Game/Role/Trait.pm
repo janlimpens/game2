@@ -24,6 +24,11 @@ method has_ability($action)
     return exists $abilities{$action}
 }
 
+method has($property)
+{
+    return grep { $_ eq $property } $self->properties()
+}
+
 method add_ability($action, $code)
 {
     return $abilities{$action} //= $code;
@@ -39,5 +44,17 @@ method do($entity, $action, @params)
     }
     return
 }
+
+method get($property)
+{
+    return
+        Game::Domain::Result->new(
+            $self->has($property)
+                ? ( some => $self->$property() )
+                : ( error => "Property $property not found")
+        )
+}
+
+method properties();
 
 1;

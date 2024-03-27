@@ -1,6 +1,6 @@
 use v5.38;
 use local::lib;
-use Object::Pad;
+use Object::Pad ':experimental(inherit_field)';
 
 class Game::Trait::Body;
 
@@ -57,35 +57,6 @@ method diameter($d=undef)
     return $body->diameter()
 }
 
-ADJUST :params ( :$height, :$width, :$diameter )
-{
-    $body = Game::Domain::Body->new(
-        height => $height,
-        width => $width,
-        diameter => $diameter);
-
-    my %abilities = (
-        diameter => \&diameter,
-        fits_inside => method ($entity, $other)
-        {
-            my $other_body = $other->do('get_body');
-            return $body->fits_inside($other_body)
-        },
-        fits_through => method ($entity, $other) {
-            return $body->fits_through($other)
-        },
-        get_body => method ($entity) { return $body },
-        height => \&height,
-        width => \&width,
-        volume => \&volume,
-    );
-
-    for my $ability (keys %abilities)
-    {
-        $self->add_ability($ability, $abilities{$ability});
-    }
-}
-
 method volume()
 {
     return $body->volume()
@@ -113,6 +84,41 @@ method equal_to($other)
     return $body->equal_to($other)
 }
 
+method properties()
+{
+    return qw(body height width diameter)
+}
+
 apply Game::Role::Trait;
+
+ADJUST :params ( :$height, :$width, :$diameter )
+{
+    $body = Game::Domain::Body->new(
+        height => $height,
+        width => $width,
+        diameter => $diameter);
+
+    my %abilities = (
+        diameter => \&diameter,
+        fits_inside => method ($entity, $other)
+        {
+            my $other_body = $other->do('get_body');
+            return $body->fits_inside($other_body)
+        },
+        fits_through => method ($entity, $other) {
+            return $body->fits_through($other)
+        },
+        get_body => method ($entity) { return $body },
+        height => \&height,
+        width => \&width,
+        volume => \&volume,
+    );
+
+    for my $ability (keys %abilities)
+    {
+        $self->add_ability($ability, $abilities{$ability});
+    }
+
+};
 
 1;

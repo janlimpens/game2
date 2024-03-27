@@ -173,6 +173,11 @@ method go_to($entity, $target)
     return false
 }
 
+method properties()
+{
+    return ()
+}
+
 apply Game::Role::Trait;
 
 1;

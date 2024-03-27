@@ -48,6 +48,11 @@ method update($entity, $iteration)
     return $changes
 }
 
+method properties()
+{
+    return ()
+}
+
 apply Game::Role::Trait;
 
 sub default_curve($time, $body, $min, $max, $value, $changes)

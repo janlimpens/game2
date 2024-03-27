@@ -39,6 +39,12 @@ method update($entity, $iteration)
     return \%changes
 }
 
+
+method properties()
+{
+    return qw(position)
+}
+
 apply Game::Role::Trait;
 
 ADJUST

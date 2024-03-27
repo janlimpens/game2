@@ -9,8 +9,6 @@ no warnings qw(experimental::builtin);
 
 subtest 'Game::Trait::Body' => sub
 {
-    plan tests => 6;
-
     my $body = Game::Trait::Body->new(
         height => 1,
         width => 2,
@@ -31,6 +29,9 @@ subtest 'Game::Trait::Body' => sub
     is $e->do('fits_inside', $e), undef, 'fits_inside()';
 
     is $body->stringify(), 'Body (h: 1;w: 2; d: 3)', 'stringify()';
+
+    ok $body->has('height'), 'has(height)';
+    is $body->get('diameter')->unwrap(), 3, 'get_property(diameter)';
 };
 
 done_testing();
