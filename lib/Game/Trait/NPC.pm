@@ -60,7 +60,7 @@ method stand_around($entity)
     my $pos = $self->get_position($entity)->stringify();
     say "$name just slacks off at position $pos.";
 
-    $changes{does}{something} = false;
+    $changes{does}{okthing} = false;
 
     return
 }

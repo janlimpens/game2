@@ -27,7 +27,7 @@ subtest 'Game::Trait::Body' => sub
     my $e = Game::Entity->new(
         initial_traits => [ $body ]);
 
-    is $e->do('fits_inside', $e)->is_error(), true,
+    is $e->do('fits_inside', $e)->is_err(), true,
         'does not fits_inside() (same body)';
 
     is $body->stringify(), 'Body (h: 1;w: 2; d: 3)', 'stringify()';

@@ -99,7 +99,7 @@ method look_around($entity)
 
     my $position = $entity->get('position');
 
-    if ($position->is_error())
+    if ($position->is_err())
     {
         say "$name has no position. Can't look around.";
         return
@@ -107,7 +107,7 @@ method look_around($entity)
 
     $position = $position->unwrap();
 
-    say "$name takes some time to look around.";
+    say "$name takes ok time to look around.";
 
     my @candidates =
         grep {

@@ -35,7 +35,7 @@ method does_have($property)
 method do($entity, $action, @params)
 {
     return
-        Result->with_error("Action $action not found")
+        Result->with_err("Action $action not found")
             unless $self->can_do($action);
 
     try
@@ -45,11 +45,11 @@ method do($entity, $action, @params)
         return $x
             if defined $x && $x->isa('Game::Domain::Result');
 
-        return Result->with_some($x)
+        return Result->with_ok($x)
     }
     catch($e)
     {
-        return Result->with_error($e)
+        return Result->with_err($e)
     }
 }
 
@@ -57,10 +57,10 @@ method get($property)
 {
     if ($self->does_have($property))
     {
-        return Result->with_some($self->$property())
+        return Result->with_ok($self->$property())
     }
 
-    return Result->with_error("Property $property not found")
+    return Result->with_err("Property $property not found")
 }
 
 1;

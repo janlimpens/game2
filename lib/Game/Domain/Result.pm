@@ -8,66 +8,66 @@ no warnings qw(experimental::builtin);
 use builtin qw(true false blessed);
 use Carp qw(longmess croak confess);
 
-field $error :reader :param=undef;
-field $some :param=undef;
+field $err :reader :param=undef;
+field $ok :param=undef;
 
 ADJUST
 {
     # undef can be a valid result value,
     # so we need an option type, too.
     # result->ok and err (with_ok, with_err)
-    # option->some and none (with_some, with_none)
+    # option->ok and none (with_ok, with_none)
     confess 'Some or Error required, not both'
-        if defined $error && defined $some;
+        if defined $err && defined $ok;
 
-    confess 'Either some or error required required'
-        if !defined $error && !defined $some;
+    confess 'Either ok or err required required'
+        if !defined $err && !defined $ok;
 
-    confess 'some cannot be another Result'
-        if blessed $some
-        && $some->isa('Game::Domain::Result');
+    confess 'ok cannot be another Result'
+        if blessed $ok
+        && $ok->isa('Game::Domain::Result');
 }
 
-method some()
+method ok()
 {
     return wantarray()
-        ? ref $some eq 'ARRAY' ? $some->@* : ($some)
-        : $some
+        ? ref $ok eq 'ARRAY' ? $ok->@* : ($ok)
+        : $ok
 }
 
-method with_error :common ($error)
+method with_err :common ($err)
 {
-    return $class->new(error => $error)
+    return $class->new(err => $err)
 }
 
-method with_some :common ($some)
+method with_ok :common ($ok)
 {
-    return $class->new(some => $some)
+    return $class->new(ok => $ok)
 }
 
 method unwrap()
 {
-    croak $error
-        if $self->is_error();
+    croak $err
+        if $self->is_err();
 
-    return $self->some()
+    return $self->ok()
 }
 
 method unwrap_or($default)
 {
-    return $self->is_error()
+    return $self->is_err()
         ? $default
-        : $self->some()
+        : $self->ok()
 }
 
-method is_some()
+method is_ok()
 {
-    return defined $some
+    return defined $ok
 }
 
-method is_error()
+method is_err()
 {
-    return defined $error
+    return defined $err
 }
 
 1;

@@ -95,13 +95,9 @@ method find_traits_with_ability($ability)
 
 method find_traits_with_property($property)
 {
-    p %traits, as => 'traits';
-
     my @found_traits =
         grep { $_->does_have($property) }
         values %traits;
-
-    p @found_traits, as => 'found traits';
 
     return @found_traits
 }

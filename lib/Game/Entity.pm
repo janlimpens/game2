@@ -38,7 +38,7 @@ method do($ability, @params)
         return $trait->do($self, $ability, @params);
     }
 
-    return Game::Domain::Result->with_error("Entity $id does not have ability $ability.");
+    return Game::Domain::Result->with_err("Entity $id does not have ability $ability.");
 }
 
 method get($property)
@@ -47,9 +47,7 @@ method get($property)
         map { $_->get($property) }
         $self->find_traits_with_property($property);
 
-    p @results, as => 'results';
-
-    return Game::Domain::Result->with_error("Entity $id does not have property $property.")
+    return Game::Domain::Result->with_err("Entity $id does not have property $property.")
         unless @results;
 
     if (@results == 1)

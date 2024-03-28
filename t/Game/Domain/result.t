@@ -12,24 +12,24 @@ no warnings qw(experimental::builtin);
 
 subtest 'Game::Domain::Result' => sub
 {
-    my $e_res = Game::Domain::Result->new( error => 'error' );
+    my $e_res = Game::Domain::Result->new( err => 'err' );
 
-    is $e_res->error(), 'error', 'error()';
+    is $e_res->err(), 'err', 'err()';
 
-    is $e_res->some(), undef, 'some()';
+    is $e_res->ok(), undef, 'ok()';
 
-    my $s_res = Game::Domain::Result->new( some => 'some' );
+    my $s_res = Game::Domain::Result->new( ok => 'ok' );
 
-    is $s_res->error(), undef, 'error()';
+    is $s_res->err(), undef, 'err()';
 
-    is $s_res->some(), 'some', 'some()';
+    is $s_res->ok(), 'ok', 'ok()';
 
     # like( dies { die 'xxx' }, qr/xxx/, "Got exception" );
 
     like( dies {
             Game::Domain::Result->new(
-                error => 'error',
-                some  => 'some' );
+                err => 'err',
+                ok  => 'ok' );
         },
         qr/Some or Error required, not both/
       );
@@ -37,28 +37,28 @@ subtest 'Game::Domain::Result' => sub
     like( dies {
             Game::Domain::Result->new();
         },
-        qr/Either some or error required required/
+        qr/Either ok or err required required/
       );
 };
 
-subtest some => sub
+subtest ok => sub
 {
-    my $res = Game::Domain::Result->new( some => ['x', 'y'] );
-    my @some = $res->some();
-    is $some[0], 'x', 'some()0';
-    is $some[1], 'y', 'some()1';
-    my $some = $res->some();
-    is $some, ['x', 'y'], 'some()';
-    my ($x, $y) = $res->some();
-    is $x, 'x', 'some()';
-    is $y, 'y', 'some()';
+    my $res = Game::Domain::Result->new( ok => ['x', 'y'] );
+    my @ok = $res->ok();
+    is $ok[0], 'x', 'ok()0';
+    is $ok[1], 'y', 'ok()1';
+    my $ok = $res->ok();
+    is $ok, ['x', 'y'], 'ok()';
+    my ($x, $y) = $res->ok();
+    is $x, 'x', 'ok()';
+    is $y, 'y', 'ok()';
 
-    my $single = Game::Domain::Result->new( some => 'x' );
-    my @single = $single->some();
+    my $single = Game::Domain::Result->new( ok => 'x' );
+    my @single = $single->ok();
     is $single[0], 'x', 'single()';
-    is $single->some(), 'x', 'single()';
+    is $single->ok(), 'x', 'single()';
 
-    my ($unwrapped) = $res->some();
+    my ($unwrapped) = $res->ok();
     is $unwrapped, 'x', 'unwrapped()';
 };
 

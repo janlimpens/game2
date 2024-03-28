@@ -89,7 +89,7 @@ method move($entity, @params)
 
     my $position = $entity->get('position');
 
-    if ($position->is_error())
+    if ($position->is_err())
     {
         croak "$called doesn't have a position.";
     }
