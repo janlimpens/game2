@@ -26,15 +26,15 @@ method stringify()
 method update($entity, $iteration)
 {
     my %actions = (
-        walk_aimlessly => \&walk_aimlessly,
-        stand_around => \&stand_around,
-        repeat_last_movement => \&repeat_last_movement,
+        walk_aimlessly => 1,
+        stand_around => 1,
+        repeat_last_movement => 1,
     );
 
     #random
     my ($action) = keys %actions;
 
-    $actions{$action}->($self, $entity);
+    $self->$action($entity);
 
     return \%changes
 }
@@ -46,12 +46,12 @@ method move($entity, $direction)
 
 method get_vicinity($entity)
 {
-    return $entity->do('get_vicinity')
+    return $entity->get('vicinity')
 }
 
 method get_name($entity)
 {
-    return $entity->do('get_name')
+    return $entity->get('name')
 }
 
 method stand_around($entity)
@@ -67,7 +67,7 @@ method stand_around($entity)
 
 method get_position($entity)
 {
-    return $entity->do('get_position')
+    return $entity->get('position')
 }
 
 method repeat_last_movement($entity)
@@ -117,6 +117,11 @@ method walk_aimlessly($entity)
     $changes{wanders}{$direction} = $pos->stringify();
 
     return
+}
+
+method properties()
+{
+    return ()
 }
 
 apply Game::Role::Trait;

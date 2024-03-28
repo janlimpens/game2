@@ -80,37 +80,40 @@ method update($entity, $iteration)
     return $sight
 }
 
-apply Game::Role::Trait;
-
-ADJUST
+method properties()
 {
-    my %abilities = (
-        look_around => \&look_around,
-        look_at => \&look_at,
-    );
-
-    for my ($ability, $method) (%abilities)
-    {
-        $self->add_ability($ability, $method);
-    };
+    return qw(max_distance decrement)
 }
+
+method abilities()
+{
+    return qw(look_around look_at)
+}
+
+apply Game::Role::Trait;
 
 method look_around($entity)
 {
-    my $name = $entity->do('get_name') // $entity->id();
+    my $name =
+        $entity->get('name')->unwrap_or($entity->id());
 
-    my $position = $entity->do('get_position');
+    my $position = $entity->get('position');
 
-    unless ($position)
+    if ($position->is_error())
     {
         say "$name has no position. Can't look around.";
         return
     }
 
+    $position = $position->unwrap();
+
     say "$name takes some time to look around.";
 
     my @candidates =
-        grep { $_->id() ne $entity->id() && $_->do('is_visible')}
+        grep {
+            $_->id() ne $entity->id()
+            && $_->get('is_visible')->unwrap_or(false)
+        }
         $world->get_entities_by_type(qw(
             Game::Trait::Position
             Game::Trait::Visible));
@@ -119,7 +122,7 @@ method look_around($entity)
     my @in_range =
         sort { $a->[1] <=> $b->[1] }
         map {
-            my $p = $_->do('get_position');
+            my $p = $_->get('position')->unwrap();
             my $d = $p->distance_to($position);
             $d <= $max_distance
                 ? ([$p, $d, $_])
@@ -136,8 +139,8 @@ method look_around($entity)
     for (@in_range)
     {
         my ($p, $d, $e) = $_->@*;
-        my $name = $e->do('get_name');
-        my $description = $e->do('get_random_fact');
+        my $name = $e->get('name')->unwrap_or($e->id());
+        my $description = $e->get('appearance')->unwrap_or('');
         my $dir = $position->approximate_direction_of($p);
         say "In the $dir, there is $name. $description";
     }
@@ -151,10 +154,10 @@ method can_see($entity, $target)
     return unless $target;
 
     return unless
-        my $own_position = $entity->do('get_position');
+        my $own_position = $entity->get('position')->unwrap_or(undef);
 
     return unless
-        my $target_position = $target->do('get_position');
+        my $target_position = $target->get('position')->unwrap_or(undef);
 
     my $distance = $target_position->distance_to($own_position);
 
@@ -165,13 +168,15 @@ method can_see($entity, $target)
 
 method look_at($entity, $target)
 {
-    my $position = $entity->do('get_position');
-    my $name = $target->do('get_name') // $target->id();
+    my $position = $entity->get('position')->unwrap();
+
+    my $name = $target->get('name')->unwrap_or($target->id());
+
     if ($self->can_see($entity, $target))
     {
-        my $description = $target->do('get_description');
-        my $t_pos = $target->do('get_position');
-        my $dir = $self->approximate_direction($position, );
+        my $description = $target->get('appearance')->unwrap_or('');
+        my $t_pos = $target->get('position')->unwrap();
+        my $dir = $self->approximate_direction($position, $t_pos);
         my $d = $position->distance_to($t_pos);
         say "In the $dir, $d m away of $name, there is $name. $description";
     }

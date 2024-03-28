@@ -6,19 +6,33 @@ class Game::Domain::Result;
 
 no warnings qw(experimental::builtin);
 use builtin qw(true false blessed);
-use Carp;
+use Carp qw(longmess croak confess);
 
 field $error :reader :param=undef;
-field $some :reader :param=undef;
+field $some :param=undef;
 
 ADJUST
 {
-    # croak does not seem to work here
-    die 'Some or Error required, not both'
+    # undef can be a valid result value,
+    # so we need an option type, too.
+    # result->ok and err (with_ok, with_err)
+    # option->some and none (with_some, with_none)
+    confess 'Some or Error required, not both'
         if defined $error && defined $some;
 
-    die 'Either some or error required required'
+    confess 'Either some or error required required'
         if !defined $error && !defined $some;
+
+    confess 'some cannot be another Result'
+        if blessed $some
+        && $some->isa('Game::Domain::Result');
+}
+
+method some()
+{
+    return wantarray()
+        ? ref $some eq 'ARRAY' ? $some->@* : ($some)
+        : $some
 }
 
 method with_error :common ($error)
@@ -33,17 +47,27 @@ method with_some :common ($some)
 
 method unwrap()
 {
-    croak 'No value to unwrap'
-        unless defined $some;
+    croak $error
+        if $self->is_error();
 
-    return ref $some eq 'CODE'
-        ? $some->()
-        : $some
+    return $self->some()
 }
 
-method was_successful()
+method unwrap_or($default)
+{
+    return $self->is_error()
+        ? $default
+        : $self->some()
+}
+
+method is_some()
 {
     return defined $some
+}
+
+method is_error()
+{
+    return defined $error
 }
 
 1;

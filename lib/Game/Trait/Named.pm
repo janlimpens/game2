@@ -29,29 +29,21 @@ method update($entity, $iteration)
     return {}
 }
 
+method properties()
+{
+    return qw(name mutable)
+}
+
 apply Game::Role::Trait;
 
-ADJUST
+method set_name ($entity, $new)
 {
-    my %abilities = (
-        set_name => method($entity, $new) {
-            $name = $new
-                if $mutable && $name && $new ne $name;
-            $self->is_dirty(true);
-            return
-        },
-        get_name => method($entity) {
-            return $name
-        },
-        get_pronouns => method($entity) {
-            return $pronouns
-        },
-    );
-
-    for my $ability (keys %abilities)
+    if ($mutable && $new ne $name)
     {
-        $self->add_ability($ability, $abilities{$ability});
+        $self->is_dirty(true);
+        $name = $new
     }
+    return $self->is_dirty()
 }
 
 1;

@@ -1,6 +1,6 @@
 use v5.38;
 use local::lib;
-use Object::Pad;
+use Object::Pad ':experimental(inherit_field)';
 
 class Game::Trait::Body;
 
@@ -12,8 +12,9 @@ use Carp;
 use Data::Printer;
 use Game::Domain::Body;
 
-field $body :reader;
+field $body;
 field %changes;
+field %abilities;
 
 method height($h=undef)
 {
@@ -57,35 +58,6 @@ method depth($d=undef)
     return $body->depth()
 }
 
-ADJUST :params ( :$height, :$width, :$depth )
-{
-    $body = Game::Domain::Body->new(
-        height => $height,
-        width => $width,
-        depth => $depth);
-
-    my %abilities = (
-        fits_inside => method ($entity, $other)
-        {
-            my $other_body = $other->do('get_body');
-            return $body->fits_inside($other_body)
-        },
-        fits_through => method ($entity, $other) {
-            return $body->fits_through($other)
-        },
-        get_body => method ($entity) { return $body },
-        get_depth => sub { return $body->depth() },
-        get_height => sub { return $body->height() },
-        get_width => sub { return $body->width() },
-        get_volume => sub { return $body->volume() },
-    );
-
-    for my $ability (keys %abilities)
-    {
-        $self->add_ability($ability, $abilities{$ability});
-    }
-}
-
 method volume()
 {
     return $body->volume()
@@ -113,6 +85,49 @@ method equal_to($other)
     return $body->equal_to($other)
 }
 
+method intersects($other)
+{
+    return $body->intersects($other)
+}
+
+method properties()
+{
+    return qw(body height width depth volume)
+}
+
+method abilities()
+{
+    return qw(fits_inside fits_through)
+}
+
 apply Game::Role::Trait;
+
+method fits_inside($entity, $other)
+{
+    my $other_body = $other->get('body')->unwrap();
+
+    return $other_body->is_smaller_than($body)
+}
+
+method fits_through($entity, $other)
+{
+    return $body->fits_inside($other)
+}
+
+method body()
+{
+    return Game::Domain::Body->new(
+        height => $body->height(),
+        width => $body->width(),
+        depth => $body->depth())
+}
+
+ADJUST :params ( :$height, :$width, :$depth )
+{
+    $body = Game::Domain::Body->new(
+        height => $height,
+        width => $width,
+        depth => $depth);
+};
 
 1;

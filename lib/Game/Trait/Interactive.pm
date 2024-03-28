@@ -24,20 +24,22 @@ method description :common ($name='An entity with this trait')
     return "$name can be controlled by user commands."
 }
 
+method get_position($entity)
+{
+    return $entity->do('get_position');
+}
+
+method move($entity, $direction)
+{
+    my $name = $entity->do('get_name') // $entity->id();
+    my $m = $entity->do('move', $direction);
+    my $position = $entity->do('get_position')->stringify();
+    say "$name moves $direction and arrives at $position";
+}
+
 method update($entity, $iteration)
 {
-    unless ($init)
-    {
-        $world->subscribe(position => sub($e, $position)
-        {
-            $current_position = $position
-                if $e->id() eq $entity->id();
-        });
-
-        $init = true;
-    }
-
-    $entity_name = $entity->do('get_name') // $entity->id();
+    my $entity_name = $entity->do('get_name') // $entity->id();
 
     say "Input command for $entity_name and hit enter:";
 
@@ -77,7 +79,7 @@ method update($entity, $iteration)
     my $action = $cmd->action();
 
     return say "$entity_name does not know how to do $action"
-        unless $entity->has_ability($action);
+        unless $entity->can_do($action);
 
     return $entity->do( $cmd->action() => $cmd->params()->@* )
 }
@@ -85,6 +87,16 @@ method update($entity, $iteration)
 method stringify()
 {
     return sprintf "Interactive";
+}
+
+method properties()
+{
+    return ()
+}
+
+method abilities()
+{
+    return ();
 }
 
 apply Game::Role::Trait;

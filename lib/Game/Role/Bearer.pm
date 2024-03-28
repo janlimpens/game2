@@ -33,7 +33,7 @@ method trait_types()
     return (sort keys %traits)
 }
 
-method has_trait($trait)
+method does_have_trait($trait)
 {
     return exists $traits{$trait}
 }
@@ -60,9 +60,26 @@ method abilities()
     return @abs;
 }
 
-method has_ability($ability)
+method properties()
 {
-    return
+    my @props =
+        sort
+        map { $_->properties() }
+        values %traits;
+
+    return @props;
+}
+
+method does_have($property)
+{
+    return !!
+        grep { $_ eq $property }
+        $self->properties()
+}
+
+method can_do($ability)
+{
+    return !!
         grep { $_ eq $ability }
         $self->abilities()
 }
@@ -70,10 +87,23 @@ method has_ability($ability)
 method find_traits_with_ability($ability)
 {
     my @found_traits =
-        grep { $_->has_ability($ability) }
+        grep { $_->can_do($ability) }
         values %traits;
 
-    return @found_traits;
+    return @found_traits
+}
+
+method find_traits_with_property($property)
+{
+    p %traits, as => 'traits';
+
+    my @found_traits =
+        grep { $_->does_have($property) }
+        values %traits;
+
+    p @found_traits, as => 'found traits';
+
+    return @found_traits
 }
 
 method update($i)

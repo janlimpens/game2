@@ -21,24 +21,26 @@ subtest 'Game::Trait::Mobile' => sub
     $entity->add_trait($trait);
     $entity->add_trait($pos);
 
-    my %expected_abilities = (
-        move => {
+    my @expected_abilities = (
+        {   ability => 'move',
             params => ['n'],
-            expected => true },
-        go_to => {
-            params => [Game::Domain::Point->new(x=>10, y=>10, z=>0)],
             expected => true
         },
-    );
+        {   ability => 'go_to',
+            params => [Game::Domain::Point->new(x=>10, y=>10, z=>0)],
+            expected => true
+        });
 
-    is [$entity->abilities()], [sort keys %expected_abilities, $pos->abilities()], 'get_abilities()';
-
-    for my ($ability) (keys %expected_abilities)
+    for my ($case) (@expected_abilities)
     {
-        my $case = $expected_abilities{$ability};
+        my $ability = $case->{ability};
         my @params = ($case->{params}//[])->@*;
         my $expected = $case->{expected};
-        is $entity->do($ability, @params), $expected, "do($ability)->($params[0])";
+        my $got = $entity->do($ability, @params);
+        # p $got;
+        $got = $got->unwrap();
+        ok defined $got, "do($ability)->(@params) returns value";
+        is $got, $expected, "do($ability)->($params[0])";
     };
 };
 

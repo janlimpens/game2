@@ -10,30 +10,12 @@ no warnings qw(
     experimental::for_list);
 use builtin qw(true false);
 use feature qw(say);
+use Carp;
 use Data::Printer;
 use Game::Domain::Point;
 
 field $last_direction;
 field %changes;
-
-ADJUST
-{
-    my %abilities = (
-        move => method ($entity, @params) {
-            my ($dir) = @params;
-            return $self->move($entity, $dir)
-        },
-        go_to => method ($entity, @params) {
-            my ($target) = @params;
-            return $self->go_to($entity, $target)
-        },
-    );
-
-    for my ($ability, $code) (%abilities)
-    {
-        $self->add_ability($ability, $code);
-    }
-};
 
 field %movements = (
     north => [0, 1],
@@ -83,8 +65,7 @@ method move($entity, @params)
 
     unless ($direction)
     {
-        say "No direction given";
-        return
+        croak "No direction given";
     }
 
     $direction = $shortcuts{$direction}
@@ -92,33 +73,28 @@ method move($entity, @params)
 
     unless ($direction)
     {
-        say "Invalid direction given.";
-        return
+        croak "Invalid direction given.";
     }
 
     $last_direction = $direction;
 
     my $target_coords = $movements{$direction};
 
-    my $called = $entity->do('get_name') // $entity->id();
+    my $called = $entity->get('name') // $entity->id();
 
-    my $can_move = $entity->has_ability('set_position');
-
-    unless ($can_move)
+    unless ($entity->can_do('set_position'))
     {
-        say "$called can't move.";
-        return
+        croak "$called can't move.";
     }
 
-    my $position = $entity->do('get_position');
+    my $position = $entity->get('position');
 
-    unless ($position)
+    if ($position->is_error())
     {
-        say "$called doesn't have a position.";
-        return
+        croak "$called doesn't have a position.";
     }
 
-    # say "$called tries to move $direction.";
+    $position = $position->unwrap();
 
     my $target = Game::Domain::Point->new_from_values(
         $position->x() + $target_coords->[0],
@@ -127,18 +103,16 @@ method move($entity, @params)
 
     $entity->do('set_position', $target);
 
-    say $entity->do('get_position')->stringify();
-
     $self->is_dirty(true);
 
     $changes{move} = $direction;
-    # say "$called moved $direction.";
+
     return true
 }
 
 method _move_towards_point($entity, $target_position)
 {
-    my $position = $entity->do('get_position');
+    my $position = $entity->get('position')->unwrap_or(undef);
 
     return unless $position;
 
@@ -152,8 +126,8 @@ method _move_towards_point($entity, $target_position)
 
 method _move_towards_entity($entity, $target)
 {
-    my $position = $entity->do('get_position');
-    my $other_pos = $target->do('get_position');
+    my $position = $entity->get('position');
+    my $other_pos = $target->get('position');
 
     return unless $position || $other_pos;
 
@@ -164,8 +138,8 @@ method _move_towards_entity($entity, $target)
 
     my $new_distance =
         $entity
-        ->do('get_position')
-        ->distance($target->do('get_position'));
+        ->get('position')
+        ->distance($target->get('position'));
 
     return $new_distance < $distance
 }
@@ -173,12 +147,22 @@ method _move_towards_entity($entity, $target)
 method go_to($entity, $target)
 {
     return $self->_move_towards_point($entity, $target)
-        if $target->isa('Game::Domain::Position');
+        if $target->isa('Game::Domain::Point');
 
     return $self->_move_towards_entity($entity, $target)
         if $target->isa('Game::Entity');
 
     return false
+}
+
+method properties()
+{
+    return ()
+}
+
+method abilities()
+{
+    return qw(move go_to)
 }
 
 apply Game::Role::Trait;

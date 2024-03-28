@@ -2,12 +2,15 @@ use v5.38;
 use local::lib;
 use Object::Pad;
 use lib './lib';
+
 class Game::Entity;
 apply Game::Role::Bearer;
+
 no warnings qw(experimental::builtin);
 use builtin qw(blessed true false);
 use Carp;
 use Data::Printer;
+use Game::Domain::Result;
 # use Log::Log4perl qw(get_logger);
 
 field $id :reader :param=undef;
@@ -22,7 +25,7 @@ ADJUST
 method give_trait($other, $class)
 {
     return $other->add_trait($self->remove_trait($class))
-        if $self->has_trait($class) && !$other->has_trait($class);
+        if $self->does_have_trait($class) && !$other->does_have_trait($class);
 
     return false
 }
@@ -31,10 +34,30 @@ method do($ability, @params)
 {
     if (my ($trait) = $self->find_traits_with_ability($ability))
     {
+        # always a Result
         return $trait->do($self, $ability, @params);
     }
-    return
-    # $self->log(info => "Entity $id does not have ability $ability.");
+
+    return Game::Domain::Result->with_error("Entity $id does not have ability $ability.");
+}
+
+method get($property)
+{
+    my @results =
+        map { $_->get($property) }
+        $self->find_traits_with_property($property);
+
+    p @results, as => 'results';
+
+    return Game::Domain::Result->with_error("Entity $id does not have property $property.")
+        unless @results;
+
+    if (@results == 1)
+    {
+        return $results[0];
+    }
+
+    return wantarray() ? @results : \@results;
 }
 
 apply Game::Role::Bearer;

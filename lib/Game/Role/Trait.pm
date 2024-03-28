@@ -1,43 +1,66 @@
 use v5.38;
+use feature qw(try);
 use local::lib;
+use Data::Printer;
+use Game::Domain::Result;
 use Object::Pad;
 
 role Game::Role::Trait;
 
-no warnings qw(experimental::builtin);
-use Data::Printer;
+use constant {
+    Result => 'Game::Domain::Result',
+};
+
+no warnings qw(experimental::builtin experimental::try);
 
 field $is_dirty :accessor :param=!1;
 field %abilities;
 
 method description :common;
 
-method update;
+method update($entity, $iteration);
+method abilities();
+method properties();
 
-method abilities()
+method can_do($action)
 {
-    return sort keys %abilities
+    return grep { $action eq $_ } $self->abilities()
 }
 
-method has_ability($action)
+method does_have($property)
 {
-    return exists $abilities{$action}
-}
-
-method add_ability($action, $code)
-{
-    return $abilities{$action} //= $code;
+    return grep { $_ eq $property } $self->properties()
 }
 
 method do($entity, $action, @params)
 {
-    # p %abilities, as => 'abilities';
-    if (my $action = $abilities{$action})
-    {
-        # p $action;
-        return $action->($self, $entity, @params)
-    }
     return
+        Result->with_error("Action $action not found")
+            unless $self->can_do($action);
+
+    try
+    {
+        my $x = $self->$action($entity, @params);
+
+        return $x
+            if defined $x && $x->isa('Game::Domain::Result');
+
+        return Result->with_some($x)
+    }
+    catch($e)
+    {
+        return Result->with_error($e)
+    }
+}
+
+method get($property)
+{
+    if ($self->does_have($property))
+    {
+        return Result->with_some($self->$property())
+    }
+
+    return Result->with_error("Property $property not found")
 }
 
 1;
