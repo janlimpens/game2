@@ -81,4 +81,15 @@ method approximate_direction_of($other)
     return $distances[0][0]
 }
 
+method serialize() {
+    return $self->stringify()
+}
+
+method deserialize($data) {
+    my ($x, $y, $z) = $data =~ m/\((-?\d+)\/(-?\d+)\/(-?\d+)\)/;
+    return Game::Domain::Point->new(x => $x, y => $y, z => $z);
+}
+
+apply Game::Role::Serializes;
+
 1;

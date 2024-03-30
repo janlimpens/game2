@@ -10,7 +10,7 @@ role Game::Role::Trait;
 use constant {
     Result => 'Game::Domain::Result',
 };
-
+use builtin qw(true false);
 no warnings qw(experimental::builtin experimental::try);
 
 field $is_dirty :accessor :param=!1;
@@ -24,11 +24,13 @@ method properties();
 
 method can_do($action)
 {
+    return false unless $action;
     return grep { $action eq $_ } $self->abilities()
 }
 
 method does_have($property)
 {
+    return false unless $property;
     return grep { $_ eq $property } $self->properties()
 }
 

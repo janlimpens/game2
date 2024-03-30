@@ -40,6 +40,9 @@ method does_have_trait($trait)
 
 method add_trait($trait)
 {
+    confess('Trait must implement Game::Role::Trait')
+        unless $trait->DOES('Game::Role::Trait');
+
     return $trait
         ? $traits{blessed $trait} = $trait
         : cluck('No trait to add')
@@ -109,6 +112,8 @@ method update($i)
     for my $trait (values %traits)
     {
         my $result = $trait->update($self, $i) // next;
+
+        p $result, as  => blessed $trait unless ref $result eq 'HASH';
 
         for my($k, $v) ($result->%*) {
             $result{$k} = $v;

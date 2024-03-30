@@ -22,11 +22,11 @@ field $min :param=Body->new(height => 0, width => 0, depth => 0);
 field $max :param=Body->new(height => 3, width => 3, depth => 3);
 field $increment :param=1;
 field $curve :param=sub { default_curve(@_) };
-field $stopped_growing = false;
+field $is_outgrown = false;
 
 method description :common ($name='An entity with this trait')
 {
-    return "$name can grow."
+    return "$name can change in volume."
 }
 
 method stringify()
@@ -36,14 +36,14 @@ method stringify()
 
 method grow($entity, $iteration)
 {
-    return if $stopped_growing;
+    return if $is_outgrown;
     my $body = $body_trait->body();
 
     my $new_size = $min->is_smaller_than($max)
         ? $curve->($iteration, $body_trait, $min, $max, $increment, \%changes)
         : $curve->($iteration, $body_trait, $max, $min, $increment, \%changes);
 
-    $stopped_growing = true
+    $is_outgrown = true
         if $new_size >= $max->volume();
 
     return $new_size

@@ -10,7 +10,7 @@ use builtin qw(true false);
 use feature qw(say);
 use Data::Printer;
 
-field $name :param;
+field $name :reader :param;
 field $mutable :param=true;
 field $pronouns :param=[qw(they theirs them themself)];
 
@@ -32,6 +32,11 @@ method update($entity, $iteration)
 method properties()
 {
     return qw(name mutable)
+}
+
+method abilities()
+{
+    return qw(set_name)
 }
 
 apply Game::Role::Trait;

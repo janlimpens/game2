@@ -31,7 +31,7 @@ method get_position($entity)
 
 method move($entity, $direction)
 {
-    my $name = $entity->do('get_name') // $entity->id();
+    my $name = $entity->get('name')->unwrap_or($entity->id()) // $entity->id();
     my $m = $entity->do('move', $direction);
     my $position = $entity->do('get_position')->stringify();
     say "$name moves $direction and arrives at $position";
@@ -39,7 +39,7 @@ method move($entity, $direction)
 
 method update($entity, $iteration)
 {
-    my $entity_name = $entity->do('get_name') // $entity->id();
+    my $entity_name = $entity->get('name')->unwrap_or($entity->id());
 
     say "Input command for $entity_name and hit enter:";
 
@@ -71,17 +71,20 @@ method update($entity, $iteration)
 
     unless ($cmd)
     {
-        return say "$entity_name doesn't know what to do with $input.";
+        say "$entity_name doesn't know what to do with $input.";
+        return {}
     }
 
     $last_command = $cmd;
 
     my $action = $cmd->action();
 
-    return say "$entity_name does not know how to do $action"
+    say "$entity_name does not know how to do $action"
         unless $entity->can_do($action);
 
-    return $entity->do( $cmd->action() => $cmd->params()->@* )
+    $entity->do( $cmd->action() => $cmd->params()->@* );
+
+    return {}
 }
 
 method stringify()

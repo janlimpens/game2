@@ -32,6 +32,7 @@ method init($entity)
     {
         return if $other_entity->id() eq $entity->id();
         return unless $self->can_see($entity, $other_entity);
+
         $sight{sees}{$other_entity->id()}{move} = $direction;
 
         return $entity->id() . " sees " . $other_entity->id() . " moving $direction.";
@@ -41,29 +42,28 @@ method init($entity)
     {
         return if $other_entity->id() eq $entity->id();
         return unless $self->can_see($entity, $other_entity);
+
         $sight{sees}{$other_entity->id()}{position} = $position;
         $position = $position->stringify() if ref $position;
 
         return $entity->id() . " sees " . $other_entity->id() . " arrive at position $position.";
     });
 
-    my $body_change = sub($other, $dimension, $dim_name)
+    for my $dim (qw(height weight depth))
     {
-        return if $other->id() eq $entity->id();
-        return unless $self->can_see($entity, $other);
+        $world->subscribe($dim => sub($other, $value)
+        {
+            return if $other->id() eq $entity->id();
+            return unless $self->can_see($entity, $other);
 
-        $sight{sees}{$other->id()}{change}{$dim_name} = $dimension;
+            # my $value = $other->get($_)->unwrap_or('?');
 
-        return sprintf '%s sees %s change %s to %s.',
-            $entity->id(), $other->id(), $dim_name, $dimension;
-    };
+            $sight{sees}{$other->id()}{change}{$dim} = $value;
 
-    $world->subscribe($_ => sub($other, $dim)
-    {
-        my $dn = $_;
-        return $body_change->($other, $dim, $dn)
+            return sprintf "%s sees %s's body change %s to %s.",
+                $entity->id(), $other->id(), $dim, $value;
+        });
     }
-    ) for qw(height weight depth);
 }
 
 method update($entity, $iteration)
@@ -87,6 +87,7 @@ method properties()
 
 method abilities()
 {
+    # probably not a good idea to expose can_see
     return qw(look_around look_at)
 }
 

@@ -77,5 +77,20 @@ method stringify()
         $height, $width, $depth;
 }
 
+method serialize()
+{
+    return $self->stringify()
+}
+
+method deserialize($data)
+{
+    my ($height, $width, $depth) = $data =~ m/\((-?\d+)\/(-?\d+)\/(-?\d+)\)/;
+    return Game::Domain::Body->new(
+        height => $height,
+        width => $width,
+        depth => $depth);
+}
+
+apply Game::Role::Serializes;
 
 1;

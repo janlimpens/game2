@@ -81,4 +81,20 @@ method directions :common ()
     return [ sort { $directions{$a}->order() <=> $directions{$b}->order() } keys %directions ]
 }
 
+method stringify()
+{
+    return $name
+}
+
+method serialize()
+{
+    return $self->stringify()
+}
+
+method deserialize($string)
+{
+    return $self->named($string)
+}
+
+
 1;
