@@ -7,10 +7,11 @@ class Game::Trait::Sight;
 no warnings qw(experimental::builtin experimental::for_list);
 use builtin qw(true false);
 use feature qw(say);
+use Carp;
 use Data::Printer;
 use Game::World;
 
-field $max_distance :param=10;
+field $max_distance :reader :param=10;
 field $decrement :param=1;
 field $world = Game::World->get_instance();
 field $initialized = false;
@@ -28,6 +29,9 @@ method stringify()
 
 method init($entity)
 {
+    # traits that have a visible effect should register here somehow
+    # this list should not be kept here
+
     $world->subscribe(direction => sub($other_entity, $direction)
     {
         return if $other_entity->id() eq $entity->id();
@@ -53,9 +57,9 @@ method init($entity)
     {
         $world->subscribe($dim => sub($other, $value)
         {
-            return if $other->id() eq $entity->id();
+            return if $other->equal_to($entity);
             return unless $self->can_see($entity, $other);
-
+            return unless $value;
             # my $value = $other->get($_)->unwrap_or('?');
 
             $sight{sees}{$other->id()}{change}{$dim} = $value;

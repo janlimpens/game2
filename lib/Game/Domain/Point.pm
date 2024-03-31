@@ -12,6 +12,7 @@ use feature qw(say);
 use Carp;
 use Data::Printer;
 use Game::Domain::Direction;
+use List::Util qw(any);
 
 field $x :reader :param//=0;
 field $y :reader :param//=0;
@@ -19,14 +20,14 @@ field $z :reader :param//=0;
 
 ADJUST
 {
-    $x = $x + 0;
-    $y = $y + 0;
-    $z = $z + 0;
+    $x = $x + 0 if any { defined $_ } ( $x, $y, $z );
+    $y = $y + 0 if any { defined $_ } ( $x, $y, $z );
+    $z = $z + 0 if any { defined $_ } ( $x, $y, $z );
 }
 
 method stringify()
 {
-    return sprintf "(%d/%d/%d)", $x, $y, $z;
+    return sprintf "(%s/%s/%s)", defined $x ? ($x, $y, $z) : ('?', '?', '?');
 }
 
 method new_from_values :common (@values)
@@ -37,6 +38,11 @@ method new_from_values :common (@values)
 
 method origin :common ()
 {
+    return Game::Domain::Point->new_from_values(0,0,0);
+}
+
+method unknown :common ()
+{
     return Game::Domain::Point->new();
 }
 
@@ -45,7 +51,7 @@ method to_array()
     return ($x, $y, $z);
 }
 
-method equals_to($other)
+method equal_to($other)
 {
     return false unless $other;
     return $x == $other->x() && $y == $other->y() && $z == $other->z();
@@ -63,7 +69,7 @@ method distance_to($other)
 
 method approximate_direction_of($other)
 {
-    return if $self->equals_to($other);
+    return if $self->equal_to($other);
 
     my @distances =
         sort { $a->[1] <=> $b->[1] }

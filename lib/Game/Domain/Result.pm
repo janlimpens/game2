@@ -6,6 +6,7 @@ class Game::Domain::Result;
 
 no warnings qw(experimental::builtin);
 use builtin qw(true false blessed);
+use lib qw(lib);
 use Carp qw(longmess croak confess);
 
 field $err :reader :param=undef;
@@ -20,7 +21,7 @@ ADJUST
     confess 'Some or Error required, not both'
         if defined $err && defined $ok;
 
-    confess 'Either ok or err required required'
+    confess 'Either ok or err required'
         if !defined $err && !defined $ok;
 
     confess 'ok cannot be another Result'
@@ -35,9 +36,9 @@ method ok()
         : $ok
 }
 
-method with_err :common ($err)
+method with_err :common ($err, @params)
 {
-    return $class->new(err => $err)
+    return $class->new(err => sprintf($err, @params))
 }
 
 method with_ok :common ($ok)

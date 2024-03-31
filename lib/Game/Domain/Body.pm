@@ -20,7 +20,7 @@ method volume()
     return $height * $width * $depth
 }
 
-method fits_inside($other)
+method fits_inside($entity, $other)
 {
     croak "Wanted a Game::Domain::Body', but got a ". ref $other
         unless blessed $other && $other->isa('Game::Domain::Body');
@@ -30,7 +30,7 @@ method fits_inside($other)
         && $depth >= $other->depth();
 }
 
-method fits_through($other)
+method fits_through($entity, $other)
 {
     # $other is negative space
     return

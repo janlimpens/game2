@@ -74,6 +74,11 @@ method stringify()
         join(', ', $self->abilities())
 }
 
+method equal_to($other)
+{
+    return $id eq $other->id();
+}
+
 method log($level, $message)
 {
     # get_logger('Game::Entity')->$level($message);

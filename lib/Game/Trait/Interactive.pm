@@ -84,6 +84,9 @@ method update($entity, $iteration)
 
     $entity->do( $cmd->action() => $cmd->params()->@* );
 
+    my $sight = $entity->get('look_around')->unwrap_or({});
+    p $sight;
+
     return {}
 }
 

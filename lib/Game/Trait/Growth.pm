@@ -51,7 +51,7 @@ method grow($entity, $iteration)
 
 method update($entity, $iteration)
 {
-    return unless
+    return {} unless
         $self->grow($entity, $iteration);
 
     my $changes = { %changes };

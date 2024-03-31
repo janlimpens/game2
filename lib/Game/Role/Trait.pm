@@ -1,11 +1,12 @@
 use v5.38;
-use feature qw(try);
 use local::lib;
-use Data::Printer;
-use Game::Domain::Result;
 use Object::Pad;
 
 role Game::Role::Trait;
+use feature qw(try);
+use Carp qw(confess);
+use Data::Printer;
+use Game::Domain::Result;
 
 use constant {
     Result => 'Game::Domain::Result',
@@ -47,6 +48,9 @@ method do($entity, $action, @params)
         return $x
             if defined $x && $x->isa('Game::Domain::Result');
 
+        confess('Action did not return a Result object')
+            unless defined $x;
+
         return Result->with_ok($x)
     }
     catch($e)
@@ -59,7 +63,11 @@ method get($property)
 {
     if ($self->does_have($property))
     {
-        return Result->with_ok($self->$property())
+        if (my $value = $self->$property())
+        {
+            return Result->with_ok($value)
+        }
+        return Result->with_err('Property $property returned undef')
     }
 
     return Result->with_err("Property $property not found")

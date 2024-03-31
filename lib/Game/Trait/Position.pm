@@ -30,7 +30,7 @@ method update($entity, $iteration)
 {
     my %changes;
 
-    unless ($position->equals_to($last_position))
+    unless ($position->equal_to($last_position))
     {
         $changes{position} = $position;
         $last_position = $position;
@@ -42,12 +42,12 @@ method update($entity, $iteration)
 
 method properties()
 {
-    return qw(position vicinity)
+    return qw(position)
 }
 
 method abilities()
 {
-    return qw(set_position)
+    return qw(set_position get_vicinity)
 }
 
 apply Game::Role::Trait;
@@ -102,7 +102,7 @@ method set_position($entity, $point)
     }
     # p $target, as => 'target';
     # p $position, as => 'position';
-    return if $position->equals_to($target);
+    return if $position->equal_to($target);
     $position = $target;
     $self->is_dirty(true);
 
@@ -116,7 +116,7 @@ method position()
 
 method get_vicinity($entity)
 {
-    if (my $position = $entity->get('position'))
+    if (my $position = $entity->get('position')->unwrap_or(undef))
     {
         my %offsets = (
             s  => [0,-1],

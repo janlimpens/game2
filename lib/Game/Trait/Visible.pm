@@ -10,12 +10,13 @@ use builtin qw(true false);
 use feature qw(say);
 use Data::Printer;
 
-field $appearance :param(description)='';
+field $appearance :reader :param(description)='';
 field $visible :param=1;
+field $can_change_visibility :param=false;
 
 method description :common ($name='An entity with this trait')
 {
-    return "$name can define its visibility. Visible things have a description"
+    return "$name can define its visibility. Visible things have an appearance."
 }
 
 method stringify()
@@ -25,7 +26,7 @@ method stringify()
 
 method update($entity, $iteration)
 {
-    return
+    return {}
 }
 
 method properties()
@@ -35,20 +36,28 @@ method properties()
 
 method abilities()
 {
-    return qw(toggle_visible)
+    my @abilities = qw(toggle_visible);
+
+    return
+        grep { !$can_change_visibility || $_ ne 'toggle_visible' }
+        @abilities
 }
 
 apply Game::Role::Trait;
 
-method is_visible ($entity)
+method is_visible ()
 {
     return $visible
 }
 
 method toggle_visible ($entity)
 {
+    return false
+        unless $can_change_visibility;
+
     $visible = !$visible;
     $self->is_dirty(true);
+
     return $visible
 }
 

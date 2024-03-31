@@ -54,6 +54,7 @@ sub build_human(%args)
     my $position = delete $args{position} // Point->origin();
     my $traits = delete $args{initial_traits} // [];
     my $width = delete $args{width}//1;
+    my $age = delete $args{age} // 0;
 
     my $body_trait =
         Body->new(height => $height, width => $width, depth => $depth);
@@ -73,6 +74,7 @@ sub build_human(%args)
             Growth->new(
                 min => Game::Domain::Body->new(height => 3, width => 1.2, depth => 1.2),
                 max => Game::Domain::Body->new(height => 2.3, width => 1, depth => 1),
+                is_outgrown => $age > 18,
                 increment => 0.01,
                 body_trait => $body_trait,
             ),
@@ -98,14 +100,15 @@ my $alice = build_human(
 
 $world->add_entity($alice);
 
-my $bob = build_human(
-    name => 'Bob',
-    description => 'Bob is a nice guy.',
+my $lewis = build_human(
+    name => 'lewis',
+    age => 45,
+    description => 'lewis is a nice guy.',
     position => Point->new(x=>1, y=>1, z=>0),
     initial_traits => [ Interactive->new() ]
 );
 
-$world->add_entity($bob);
+$world->add_entity($lewis);
 
 my $tree_body = Body->new(height => 10, width => 10, depth => 3);
 
@@ -130,12 +133,14 @@ my $cat = Entity->new(
     id => 'cat',
     initial_traits => [
         Body->new(height => 1, width => 1, depth => 1),
-        Named->new(name => 'the Cheshire cat'),
+        Named->new(name => 'The Cheshire Cat'),
         Position->new(position => [6,6,6]),
         Visible->new(
             visible => false,
-            description => 'The cat smiles, but nobody can see it.'),
+            description => 'The cat smiles, but nobody can see it.',
+            can_change_visibility => true),
         Sight->new(distance => 5),
+        NPC->new(),
     ]);
 
 $world->add_entity($cat);
@@ -149,7 +154,6 @@ my $loop = 0;
 
 until($stop_me || $world->should_quit())
 {
-    $bob->do('look_around');
     $world->update($loop++);
 }
 

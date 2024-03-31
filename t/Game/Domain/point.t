@@ -34,10 +34,10 @@ subtest equality => sub
 {
     my $p1 = Game::Domain::Point->new(x => 1, y => 2, z => 3);
     my $p2 = Game::Domain::Point->new(x => 1, y => 2, z => 3);
-    is $p1->equals_to($p2), true, 'equals_to()';
+    is $p1->equal_to($p2), true, 'equal_to()';
 
     my $p3 = Game::Domain::Point->new(x => 1, y => 5, z => 3);
-    is $p1->equals_to($p3), false, 'equals_to()';
+    is $p1->equal_to($p3), false, 'equal_to()';
 };
 
 subtest new_from_values => sub

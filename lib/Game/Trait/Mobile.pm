@@ -117,7 +117,7 @@ method _move_towards_point($entity, $target_position)
     return unless $position;
 
     return true
-        if $position->equals_to($target_position);
+        if $position->equal_to($target_position);
 
     my $direction = $position->approximate_direction_of($target_position);
 

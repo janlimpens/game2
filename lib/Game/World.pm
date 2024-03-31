@@ -7,6 +7,7 @@ class Game::World :isa( Game::Entity );
 no warnings qw(experimental::builtin);
 
 use builtin qw(blessed true false);
+use Carp;
 use Data::Printer;
 use List::Util qw(all first);
 use Term::ANSIColor;
@@ -61,7 +62,7 @@ method get_entity_at($point)
     return
         first {
             my $pos = $_->get('position');
-            $pos ? $pos->equals_to($point) : false
+            $pos ? $pos->equal_to($point) : false
         }
         values %entities
 }
@@ -91,10 +92,15 @@ method update($i)
     for my $entity (values %entities)
     {
         my $changes = $entity->update($i);
-        $changes{$entity->id()} = $changes
-            if $changes && $changes->%*;
-    }
 
+        if ($changes && ref $changes eq 'HASH')
+        {
+            $changes{$entity->id()} = $changes
+        } else {
+            p $entity;
+            confess (sprintf 'No change HashRef returned by entity %s', $entity->id())
+        }
+    }
 
     for my $id (keys %changes)
     {
@@ -106,12 +112,12 @@ method update($i)
             my $subscribers = $subscriptions{$change};
             for ($subscribers->@*)
             {
-                say $_->($entity, $changes->{$change})
+                p $_->($entity, $changes->{$change})
             }
         }
     }
 
-    p %changes, as => 'changes';
+    # p %changes, as => 'changes for iteration ' . $i;
 
     print color('reset');
     say '-' x 80;

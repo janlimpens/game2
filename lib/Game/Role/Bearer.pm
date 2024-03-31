@@ -75,6 +75,7 @@ method properties()
 
 method does_have($property)
 {
+    # return false unless $property;
     return !!
         grep { $_ eq $property }
         $self->properties()
@@ -82,6 +83,7 @@ method does_have($property)
 
 method can_do($ability)
 {
+    # return false unless $ability;
     return !!
         grep { $_ eq $ability }
         $self->abilities()
@@ -113,7 +115,8 @@ method update($i)
     {
         my $result = $trait->update($self, $i) // next;
 
-        p $result, as  => blessed $trait unless ref $result eq 'HASH';
+        confess(sprintf 'Trait %s did not provide change hash, but %s.', blessed $trait, $result)
+            unless ref $result eq 'HASH';
 
         for my($k, $v) ($result->%*) {
             $result{$k} = $v;
