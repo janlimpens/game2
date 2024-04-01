@@ -3,7 +3,10 @@ use local::lib;
 use Object::Pad;
 
 role Game::Role::Trait;
+
 use feature qw(try);
+no warnings qw(experimental::builtin);
+use builtin qw(blessed);
 use Carp qw(confess);
 use Data::Printer;
 use Game::Domain::Result;
@@ -46,7 +49,7 @@ method do($entity, $action, @params)
         my $x = $self->$action($entity, @params);
 
         return $x
-            if defined $x && $x->isa('Game::Domain::Result');
+            if blessed $x && $x->isa('Game::Domain::Result');
 
         confess('Action did not return a Result object')
             unless defined $x;

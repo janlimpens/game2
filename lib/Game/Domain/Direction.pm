@@ -66,6 +66,7 @@ method names :common ()
 
 method named :common ($name)
 {
+    return unless $name;
     return
         first { $_->name() eq $name }
         values %directions
@@ -73,6 +74,7 @@ method named :common ($name)
 
 method direction :common ($direction)
 {
+    return unless $direction;
     return $directions{$direction}
 }
 

@@ -11,22 +11,21 @@ use Carp qw(longmess croak confess);
 
 field $err :reader :param=undef;
 field $ok :param=undef;
+field $is_ok :param=false;
 
 ADJUST
 {
-    # undef can be a valid result value,
-    # so we need an option type, too.
-    # result->ok and err (with_ok, with_err)
-    # option->ok and none (with_ok, with_none)
-    confess 'Some or Error required, not both'
-        if defined $err && defined $ok;
+    while (blessed $ok && $ok->isa('Game::Domain::Result'))
+    {
+        $ok = $ok->ok();
+        $err = $ok->err()
+    }
 
-    confess 'Either ok or err required'
-        if !defined $err && !defined $ok;
-
-    confess 'ok cannot be another Result'
-        if blessed $ok
-        && $ok->isa('Game::Domain::Result');
+    while (blessed $err && $err->isa('Game::Domain::Result'))
+    {
+        $ok = $err->ok();
+        $err = $err->err();
+    }
 }
 
 method ok()
@@ -43,7 +42,7 @@ method with_err :common ($err, @params)
 
 method with_ok :common ($ok)
 {
-    return $class->new(ok => $ok)
+    return $class->new(ok => $ok, is_ok => true)
 }
 
 method unwrap()
@@ -63,12 +62,12 @@ method unwrap_or($default)
 
 method is_ok()
 {
-    return defined $ok
+    return $is_ok
 }
 
 method is_err()
 {
-    return defined $err
+    return !$is_ok
 }
 
 1;

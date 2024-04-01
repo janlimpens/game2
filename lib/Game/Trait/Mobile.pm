@@ -8,7 +8,7 @@ class Game::Trait::Mobile;
 no warnings qw(
     experimental::builtin
     experimental::for_list);
-use builtin qw(true false);
+use builtin qw(blessed true false);
 use feature qw(say);
 use Carp;
 use Data::Printer;
@@ -68,19 +68,26 @@ method move($entity, @params)
         croak "No direction given";
     }
 
-    $direction = $shortcuts{$direction}
-        unless $movements{$direction};
+    my $dir = (blessed($direction) // 'x') eq 'Game::Domain::Direction'
+        ? $direction->name()
+        : $shortcuts{$direction}
+            unless $movements{$direction};
 
-    unless ($direction)
+    unless ($dir || Game::Domain::Direction->named($dir))
     {
-        croak "Invalid direction given.";
+
+        croak "Invalid direction $direction given.";
     }
 
-    $last_direction = $direction;
+    $last_direction = $dir
+        if Game::Domain::Direction->named($dir);
 
-    my $target_coords = $movements{$direction};
+    my $target_coords = $movements{$dir};
 
-    my $called = $entity->get('name') // $entity->id();
+    croak 'No target coordinates obtained.'
+        unless $target_coords;
+
+    my $called = $entity->get('name')->unwrap_or($entity->id());
 
     unless ($entity->can_do('set_position'))
     {

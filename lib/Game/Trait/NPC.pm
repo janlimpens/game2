@@ -39,7 +39,7 @@ method update($entity, $iteration)
 
     return {} unless $ability;
 
-    my $result = $self->do_something($entity, $ability);
+    my $result = $self->_do_something($entity, $ability);
     # p $result, as => 'result from npc';
 
     # p %memory;
@@ -47,101 +47,86 @@ method update($entity, $iteration)
     return \%changes
 }
 
-method move($entity, $direction)
+method _move($entity, $direction=undef)
 {
-    my $result = $entity->do('move', $direction);
+    my $curr_pos = $entity->get('position')->unwrap_or(Game::Domain::Point->unknown());
+    # p $curr_pos, as => "pos " . $entity->id();
 
-    $memory{move}{'Game::Domain::Direction'} //= 0;
-    $memory{move}{'Game::Domain::Direction'} += $result->is_ok() ? 1 : -1;
+    $direction =
+        Game::Domain::Direction->direction($direction)
+        // Game::Domain::Direction->direction($last_direction)
+        // $self->_try_get_random_free_direction($entity)
+        if (blessed $direction // 'x') ne 'Game::Domain::Direction';
+
+    # p $direction, as => 'dir ' . $entity->id();
+
+    return Game::Domain::Result->with_err('can\'t move')
+        unless $direction;
+
+    my $result = $entity->do('move', $direction);
+    # p $result;
+
+    $memory{move}{$direction} //= 0;
+    $memory{move}{$direction} += $result->is_ok() ? 1 : -1;
+
+    $last_direction = $direction
+        if $result->is_ok();
+
+    $curr_pos = $entity->get('position')->unwrap_or(Game::Domain::Point->unknown());
+    # p $curr_pos, as => "pos " . $entity->id();
 
     return $result
-}
-
-method get_vicinity($entity)
-{
-    return $entity->do('get_vicinity', $entity)
-}
-
-method get_name($entity)
-{
-    return $entity->get('name')
 }
 
 method stand_around($entity)
 {
-    my $name = $self->get_name($entity)->unwrap_or($entity->id());
-    my $pos = $self->get_position($entity)->stringify();
-    say "$name just slacks off at position $pos.";
+    my $name = $entity->get('name')->unwrap_or($entity->id());
 
-    $changes{does}{okthing} = false;
+    my %variations =
+        map { $_ => 1 }
+        (
+        'nothing',
+        'nothing whatsoever',
+        'nothing at all',
+        'stare at their feet');
 
-    return Game::Domain::Result->new(ok => true)
-}
+    my ($v) = keys %variations;
 
-method get_position($entity)
-{
-    return $entity->get('position')->unwrap()
+    $changes{does}{$v} = true;
+    $last_direction = undef;
+
+    return Game::Domain::Result->with_ok(true)
 }
 
 method repeat_last_movement($entity)
 {
-    return $self->walk_aimlessly($entity)
-        unless $last_direction;
+    $self->_move($entity)
+}
 
-    my $vicinity = $self->get_vicinity($entity)->unwrap_or(undef);
+method _try_get_random_free_direction($entity)
+{
+    my $vicinity = $entity->do('get_vicinity');
 
-    return Game::Domain::Result->with_err('Entity %s has no vicinity', $entity->id())
-        unless $vicinity;
+    $vicinity = $vicinity->unwrap_or(undef);
+
+    return unless $vicinity;
 
     my %open_directions = $vicinity
         ? map { $_ => 1 } grep { !$vicinity->{$_} } keys $vicinity->%*
         : ();
 
-    my $can_go_there = $open_directions{$last_direction};
+    my ($dir) = keys %open_directions;
 
-    my $name = $self->get_name($entity)->unwrap_or($entity->id());
-
-    say "$name continues to walk $last_direction."
-        if $can_go_there;
-
-    return $can_go_there
-        ? $self->move($entity, $last_direction)
-        : $self->walk_aimlessly($entity)
+    return $dir
 }
 
 method walk_aimlessly($entity)
 {
-    my $vicinity = $self->get_vicinity($entity)->unwrap_or(undef);
-
-    return
-        Game::Domain::Result->with_err("No vicinity")
-            unless $vicinity;
-
-    my $name = $self->get_name($entity)->unwrap_or($entity->id());
-
-    my %open_directions = $vicinity
-        ? map { $_ => 1 } grep { !$vicinity->{$_} } keys $vicinity->%*
-        : ();
-
-    my ($direction) = keys %open_directions;
-
-    return $self->stand_around($entity)
-        unless $direction;
-
-    $last_direction = $direction;
-
-    my $result = $self->move($entity, $direction);
-
-    $memory{walk_aimlessly}{'Game::Domain::Direction'} //= 0;
-    $memory{walk_aimlessly}{'Game::Domain::Direction'} += $result->is_ok() ? 1 : -1;
-
-    my $pos = $self
-        ->get_position($entity)
-        ->unwrap_or(Game::Domain::Point->new(x => 0, y => 0));
-
-    $changes{wanders}{$direction} = $pos->stringify();
-
-    return $result
+    my $dir = $self->_try_get_random_free_direction($entity);
+    # say "Got dir $dir";
+    my $result = $self->_move($entity, $dir);
+    # p $result;
+    return $result;
 }
 
 method do_something_random($entity)
@@ -164,7 +149,7 @@ method do_something_random($entity)
 
     my @param = $entity->get($param)->unwrap_or(undef);
 
-    return $self->do_something($entity, $ability, grep {$_} @param)
+    return $self->_do_something($entity, $ability, grep {$_} @param)
 }
 
 method get_type(@param)
@@ -188,19 +173,21 @@ method get_type(@param)
             : 'STRING'
 }
 
-method do_something($entity, $ability, @params)
+method _do_something($entity, $ability, @params)
 {
     confess "No ability given"
         unless $ability;
 
     confess "No recursion"
-        if $ability eq 'do_something';
+        if $ability eq '_do_something';
 
     return
         Game::Domain::Result->with_err("Entity cannot do $ability")
             unless $entity->can_do($ability);
 
     my $result = $entity->do($ability, @params);
+
+    # p $result, as => $entity->id() . '::' . $ability;
 
     my $type = $self->get_type(@params);
     my ($value) = @params;
@@ -236,7 +223,7 @@ method do_something_easy($entity)
     return $self->walk_aimlessly($entity)
         unless $ability;
 
-    return $self->do_something($entity, $ability)
+    return $self->_do_something($entity, $ability)
 }
 
 method try_something_new($entity, @param)
@@ -253,7 +240,7 @@ method try_something_new($entity, @param)
 
     my ($ability) = keys %never_done_before;
 
-    return $self->do_something($entity, $ability)
+    return $self->_do_something($entity, $ability)
 }
 
 method is_good_at()
@@ -278,18 +265,23 @@ method is_bad_at()
 
 method properties()
 {
-    return qw(is_good_at is_bad_at)
+    # return qw(is_good_at is_bad_at)
 }
 
 method abilities()
 {
+    # return qw(
+    #     do_something_random
+    #     do_something_easy
+    #     repeat_last_movement
+    #     stand_around
+    #     try_something_new
+    #     walk_aimlessly
+    # )
     return qw(
-        do_something_random
-        do_something_easy
-        repeat_last_movement
-        stand_around
-        try_something_new
-        walk_aimlessly
+    repeat_last_movement
+    stand_around
+    walk_aimlessly
     )
 }
 

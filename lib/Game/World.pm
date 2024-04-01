@@ -61,7 +61,7 @@ method get_entity_at($point)
 {
     return
         first {
-            my $pos = $_->get('position');
+            my $pos = $_->get('position')->unwrap_or(false);
             $pos ? $pos->equal_to($point) : false
         }
         values %entities
@@ -83,6 +83,8 @@ method update($i)
 {
     $time = $i;
 
+    my %positions;
+
     print color( join '', 'rgb', ( map { int(2 + rand(3)) } (0..2) ) );
 
     say "Iteration $i";
@@ -91,15 +93,23 @@ method update($i)
 
     for my $entity (values %entities)
     {
+        my $name = $entity->get('name')->unwrap_or(undef);
+        my $id = $entity->id();
+        my $moniker = $name ? "$id($name)" : $id;
+
         my $changes = $entity->update($i);
 
         if ($changes && ref $changes eq 'HASH')
         {
             $changes{$entity->id()} = $changes
         } else {
-            p $entity;
             confess (sprintf 'No change HashRef returned by entity %s', $entity->id())
         }
+
+        my $pos = $entity->get('position')->unwrap_or(undef);
+
+        $positions{$pos->serialize()} = $name
+            if $pos;
     }
 
     for my $id (keys %changes)
@@ -112,11 +122,14 @@ method update($i)
             my $subscribers = $subscriptions{$change};
             for ($subscribers->@*)
             {
-                p $_->($entity, $changes->{$change})
+                my $c = $_->($entity, $changes->{$change});
+                p $c, as => 'change for ' . $entity->id()
+                    if $c;
             }
         }
     }
 
+    p %positions;
     # p %changes, as => 'changes for iteration ' . $i;
 
     print color('reset');

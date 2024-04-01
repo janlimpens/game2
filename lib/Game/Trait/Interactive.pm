@@ -71,13 +71,14 @@ method update($entity, $iteration)
 
     unless ($cmd)
     {
-        say "$entity_name doesn't know what to do with $input.";
+        # say "$entity_name doesn't know what to do with $input.";
         return {}
     }
 
     $last_command = $cmd;
 
     my $action = $cmd->action();
+    return {} unless $action;
 
     say "$entity_name does not know how to do $action"
         unless $entity->can_do($action);

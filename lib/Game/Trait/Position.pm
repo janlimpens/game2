@@ -90,7 +90,7 @@ method set_position($entity, $point)
 
     if (my $occupant = $world->get_entity_at($target))
     {
-        my $occupant_name = $occupant->get('name') // $occupant->id();
+        my $occupant_name = $occupant->get('name')->unwrap_or($occupant->id());
 
         if ($occupant->id() eq $entity->id()) {
             say "$occupant_name is already at position " . $target->stringify() . ".";

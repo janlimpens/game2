@@ -36,6 +36,7 @@ method init($entity)
     {
         return if $other_entity->id() eq $entity->id();
         return unless $self->can_see($entity, $other_entity);
+        return unless $direction;
 
         $sight{sees}{$other_entity->id()}{move} = $direction;
 
@@ -155,20 +156,18 @@ method look_around($entity)
 
 method can_see($entity, $target)
 {
-    return unless $entity;
-    return unless $target;
+    return false unless $entity;
+    return false unless $target;
 
-    return unless
+    return false unless
         my $own_position = $entity->get('position')->unwrap_or(undef);
 
-    return unless
+    return false unless
         my $target_position = $target->get('position')->unwrap_or(undef);
 
     my $distance = $target_position->distance_to($own_position);
 
     return $distance <= $max_distance
-        ? $target
-        : false
 }
 
 method look_at($entity, $target)
